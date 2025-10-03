@@ -59,10 +59,17 @@ from tensorboardX import SummaryWriter
 # def get_wassersteinized_layers_modularized(///)
 # Define ground metric: class GroundMetric(args)
 # Check number layers of models: len(list(zip(networks[0].parameters(), networks[1].parameters())))
-# for l=1..L layers, do:
-    # Define muy and nuy: mu_cardinality = fc_layer0_weight.shape[0]
+# for l=0..L layers, do:
     # Distinguish layer type: FC and Conv
-
+    # if l==0:
+        # Form ground metric: M = ground_metric_object.process(///)
+            # Normalize weight: coordinates = self._normed_vecs(///)
+            # Compute ground metric matrix (euclidean/cosine/angular) (pairwise distance): ground_metric_matrix = self.get_metric(///)
+            # Normalize ground metric: ground_metric_matrix = self._normalize(///)
+    # else:
+        # Align incoming edge weight: aligned_wt = torch.bmm(///).permute(///)
+        # Form ground metric: M = ground_metric_object.process(///)
+    # Define histogram muy and nuy: mu = get_histogram(///)
 
 
 
