@@ -70,7 +70,13 @@ from tensorboardX import SummaryWriter
         # Align incoming edge weight: aligned_wt = torch.bmm(///).permute(///)
         # Form ground metric: M = ground_metric_object.process(///)
     # Define histogram muy and nuy: mu = get_histogram(///)
-
+    # Solve OT and compute transport map (emd/sinkhorn): T = ot.bregman.sinkhorn(///)
+    # Fix transport map for marginals: if args.correction
+    # print("Ratio of trace to the matrix sum: ")
+    # Align model0's weight to model1's: t_fc0_model = torch.matmul(///)
+    # Average aligned weights: geometric_fc = (///))/2        avg_aligned_layers.append(geometric_fc)
+    # Evaluate performace of the update model (optinal): if args.eval_aligned
+    
 
 
 
