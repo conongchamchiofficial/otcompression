@@ -45,11 +45,24 @@ from tensorboardX import SummaryWriter
 
 # ------- Loading pre-trained models -------
 # ? import train as cifar_train ?
-# Get dataset: cifar_train.get_dataset(config)
-# Get pre-trained models: routines.get_pretrained_model(///)
+# Get dataset: def cifar_train.get_dataset(config)
+# Get pre-trained models: def routines.get_pretrained_model(///)
 # Model structure: in _make_layers [Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False), ReLU(), MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False), Conv2d(64, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False), ReLU(), MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False), Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False), ReLU(), Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False), ReLU(), MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False), Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False), ReLU(), Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False), ReLU(), MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False), Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False), ReLU(), Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False), ReLU(), MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False), AvgPool2d(kernel_size=1, stride=1, padding=0)]
 # Model parameters: [torch.Size([64, 3, 3, 3]), torch.Size([128, 64, 3, 3]), torch.Size([256, 128, 3, 3]), torch.Size([256, 256, 3, 3]), torch.Size([512, 256, 3, 3]), torch.Size([512, 512, 3, 3]), torch.Size([512, 512, 3, 3]), torch.Size([512, 512, 3, 3]), torch.Size([10, 512])]
 # Load model path, accuracy, epoch
+# Recheck models' accuracy: def routines.test(///)
+# Print layer-param: print(f'layer {name} has #params ', param.numel())
+# Get model activation: utils.get_model_activations(///)
+
+# ------- Geometric Ensembling -------
+# def wasserstein_ensemble.geometric_ensembling_modularized(///)
+# def get_wassersteinized_layers_modularized(///)
+# Define ground metric: class GroundMetric(args)
+# Check number layers of models: len(list(zip(networks[0].parameters(), networks[1].parameters())))
+# for l=1..L layers, do:
+    # Define muy and nuy: mu_cardinality = fc_layer0_weight.shape[0]
+    # Distinguish layer type: FC and Conv
+
 
 
 
