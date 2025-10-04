@@ -158,3 +158,77 @@ if __name__ == '__main__':
             models.append(model)
             accuracies.append(accuracy)
         print("Done loading all the models")
+
+        # Additional flag of recheck_acc to supplement the legacy flag recheck_cifar
+        if args.recheck_cifar or args.recheck_acc:
+            recheck_accuracies = []
+            for model in models:
+                log_dict = {}
+                log_dict['test_losses'] = []
+                recheck_accuracies.append(routines.test(args, model, test_loader, log_dict))
+            print("Rechecked accuracies are ", recheck_accuracies)
+
+        # print('checking named modules of model0 for use in compute_activations!', list(models[0].named_modules()))
+
+        # print('what about named parameters of model0 for use in compute_activations!', [tupl[0] for tupl in list(models[0].named_parameters())])
+
+    else:
+        # get dataloaders
+        print("------- Obtain dataloaders -------")
+        train_loader, test_loader = get_dataloader(args)
+        retrain_loader, _ = get_dataloader(args, no_randomness=args.no_random_trainloaders)
+
+        print("------- Training independent models -------")
+        models, accuracies = routines.train_models(args, train_loader, test_loader)
+
+    # if args.debug:
+    #     print(list(models[0].parameters()))
+
+    if args.same_model!=-1:
+        print("Debugging with same model")
+        model, acc = models[args.same_model], accuracies[args.same_model]
+        models = [model, model]
+        accuracies = [acc, acc]
+
+    for name, param in models[0].named_parameters():
+        print(f'layer {name} has #params ', param.numel())
+
+    import time
+    # second_config is not needed here as well, since it's just used for the dataloader!
+    print("Activation Timer start")
+    st_time = time.perf_counter()
+    activations = utils.get_model_activations(args, models, config=config)
+    end_time = time.perf_counter()
+    setattr(args, 'activation_time', end_time - st_time)
+    print("Activation Timer ends")
+
+    for idx, model in enumerate(models):
+        setattr(args, f'params_model_{idx}', utils.get_model_size(model))
+
+    # if args.ensemble_iter == 1:
+    #
+    # else:
+    #     # else just recompute activations inside the method iteratively
+    #     activations = None
+
+
+    # set seed for numpy based calculations
+    NUMPY_SEED = 100
+    np.random.seed(NUMPY_SEED)
+
+    # run geometric aka wasserstein ensembling
+    print("------- Geometric Ensembling -------")
+    # Deprecated: wasserstein_ensemble.geometric_ensembling(models, train_loader, test_loader)
+
+
+    print("Timer start")
+    st_time = time.perf_counter()
+
+    geometric_acc, geometric_model = wasserstein_ensemble.geometric_ensembling_modularized(args, models, train_loader, test_loader, activations)
+    
+    end_time = time.perf_counter()
+    print("Timer ends")
+    setattr(args, 'geometric_time', end_time - st_time)
+    args.params_geometric = utils.get_model_size(geometric_model)
+
+    print("Time taken for geometric ensembling is {} seconds".format(str(end_time - st_time)))
