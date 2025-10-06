@@ -84,7 +84,8 @@ def get_wassersteinized_layers_modularized(args, networks, activations=None, eps
         device = torch.device('cuda:{}'.format(args.gpu_id))
 
 
-    num_layers = len(list(zip(networks[0].parameters(), networks[1].parameters())))    
+    num_layers = len(list(zip(networks[0].parameters(), networks[1].parameters())))
+    print(num_layers)
     return avg_aligned_layers
 
 
