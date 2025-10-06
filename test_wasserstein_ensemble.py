@@ -85,6 +85,7 @@ def get_wassersteinized_layers_modularized(args, networks, activations=None, eps
 
 
     num_layers = len(list(zip(networks[0].parameters(), networks[1].parameters())))
+    print(networks[0].parameters())
     print(num_layers)
     return avg_aligned_layers
 
