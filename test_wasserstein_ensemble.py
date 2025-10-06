@@ -68,13 +68,25 @@ def get_wassersteinized_layers_modularized(args, networks, activations=None, eps
     :return: list of layer weights 'wassersteinized'
     '''
 
-    # simple_model_0, simple_model_1 = networks[0], networks[1]
-    # simple_model_0 = get_trained_model(0, model='simplenet')
-    # simple_model_1 = get_trained_model(1, model='simplenet')
     print(networks)
-    print(networks[0])
-    print(networks[1])
-  
+    
+    avg_aligned_layers = []
+    T_var = None
+    previous_layer_shape = None
+    ground_metric_object = GroundMetric(args)
+
+    if args.eval_aligned:
+        model0_aligned_layers = []
+
+    if args.gpu_id==-1:
+        device = torch.device('cpu')
+    else:
+        device = torch.device('cuda:{}'.format(args.gpu_id))
+
+
+    num_layers = len(list(zip(networks[0].parameters(), networks[1].parameters())))    
+    return avg_aligned_layers
+
 
 
 
