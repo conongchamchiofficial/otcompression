@@ -85,11 +85,13 @@ def get_wassersteinized_layers_modularized(args, networks, activations=None, eps
 
 
     num_layers = len(list(zip(networks[0].parameters(), networks[1].parameters())))
-    print(networks[0].parameters())
-    print(num_layers)
+    print("Networks: ", networks[0].parameters())
+    print("Num layers: ", num_layers)
+    print("Named parameters: ", networks[0].named_parameters())
     return avg_aligned_layers
 
-
+def get_pairwise_similarity_score(arg, networks):
+    pass
 
 
 
