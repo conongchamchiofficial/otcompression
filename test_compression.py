@@ -2,7 +2,7 @@ import parameters
 from data import get_dataloader
 import routines
 import baseline
-import wasserstein_ensemble
+import test_wasserstein_ensemble
 import os
 import utils
 import numpy as np
@@ -224,7 +224,7 @@ if __name__ == '__main__':
     print("Timer start")
     st_time = time.perf_counter()
 
-    geometric_acc, geometric_model = wasserstein_ensemble.geometric_ensembling_modularized(args, models, train_loader, test_loader, activations)
+    geometric_acc, geometric_model = test_wasserstein_ensemble.geometric_ensembling_modularized(args, models, train_loader, test_loader, activations)
     
     end_time = time.perf_counter()
     print("Timer ends")
