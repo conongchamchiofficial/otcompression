@@ -83,14 +83,23 @@ def get_wassersteinized_layers_modularized(args, networks, activations=None, eps
     else:
         device = torch.device('cuda:{}'.format(args.gpu_id))
 
+    print("Networks: ", networks[0].parameters())
 
     num_layers = len(list(zip(networks[0].parameters(), networks[1].parameters())))
-    print("Networks: ", networks[0].parameters())
     print("Num layers: ", num_layers)
-    print("Named parameters: ", networks[0].named_parameters())
+
+    for idx, ((layer0_name, fc_layer0_weight), (layer1_name, fc_layer1_weight)) in \
+            enumerate(zip(networks[0].named_parameters(), networks[1].named_parameters())):
+        print("idx: ", idx)
+        print("layer0_name: ", layer0_name)
+        print("fc_layer0_weight: ", fc_layer0_weight)
+        print("layer1_name: ", layer1_name)
+        print("fc_layer1_weight: ", fc_layer1_weight)
+                
     return avg_aligned_layers
 
-def get_pairwise_similarity_score(arg, networks):
+def get_pairwise_similarity_score(args, networks, activations=None, eps=1e-7, test_loader=None):
+    
     pass
 
 
