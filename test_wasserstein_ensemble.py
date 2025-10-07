@@ -92,8 +92,13 @@ def get_wassersteinized_layers_modularized(args, networks, activations=None, eps
         # print("idx: ", idx)
         print("layer0_name: ", layer0_name)
         # print("fc_layer0_weight: ", fc_layer0_weight)
+        layer0_shape = fc_layer0_weight.shape
+        print(layer0_shape)
         for layer1_name, fc_layer1_weight in networks[0].named_parameters():
             print("layer1_name: ", layer1_name)
+            layer1_shape = fc_layer1_weight.shape
+            print(layer1_shape)
+            
 
                 
     return avg_aligned_layers
