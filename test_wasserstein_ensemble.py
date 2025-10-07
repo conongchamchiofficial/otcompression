@@ -88,18 +88,37 @@ def get_wassersteinized_layers_modularized(args, networks, activations=None, eps
     num_layers = len(list(zip(networks[0].parameters(), networks[1].parameters())))
     print("Num layers: ", num_layers)
 
-    for idx, (layer0_name, fc_layer0_weight) in enumerate(networks[0].named_parameters()):
-        # print("idx: ", idx)
+    for idx0, (layer0_name, fc_layer0_weight) in enumerate(networks[0].named_parameters()):
         print("layer0_name: ", layer0_name)
-        # print("fc_layer0_weight: ", fc_layer0_weight)
+        
         layer0_shape = fc_layer0_weight.shape
-        print(layer0_shape)
-        for layer1_name, fc_layer1_weight in networks[0].named_parameters():
-            print("layer1_name: ", layer1_name)
-            layer1_shape = fc_layer1_weight.shape
-            print(layer1_shape)
+        if len(layer0_shape) > 2:
+            is_layer0_conv = True
+            # For convolutional layers, it is (#out_channels, #in_channels, height, width)
+            fc_layer0_weight_data = fc_layer0_weight.data.view(fc_layer0_weight.shape[0], fc_layer0_weight.shape[1], -1)
+        else:
+            is_layer0_conv = False
+            fc_layer0_weight_data = fc_layer0_weight.data
             
+        for idx1, (layer1_name, fc_layer1_weight) in enumerate(networks[0].named_parameters()):
+            print("layer1_name: ", layer1_name)
+            
+            layer1_shape = fc_layer1_weight.shape
+            # print(layer1_shape)
+            if len(layer1_shape) > 2:
+                is_layer1_conv = True
+                # For convolutional layers, it is (#out_channels, #in_channels, height, width)
+                fc_layer1_weight_data = fc_layer1_weight.data.view(fc_layer1_weight.shape[0], fc_layer1_weight.shape[1], -1)
+            else:
+                is_layer1_conv = False
+                fc_layer1_weight_data = fc_layer1_weight.data      
 
+            if idx0 <= idx1:
+                break
+            if is_layer0_conv =! is_layer1_conv:
+                break
+
+            
                 
     return avg_aligned_layers
 
