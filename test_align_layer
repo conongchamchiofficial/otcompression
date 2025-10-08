@@ -1,0 +1,35 @@
+def get_cost(a, b, args, cost="euclidean"):
+    if cost == "euclidean":
+        return (a - b) ** 2
+    elif cost == "cca":
+        return 1 - cca(a, b)
+    elif cost == "cka":
+        return 1 - cka(gram_linear(a), gram_linear(b))
+    elif cost == "wd":
+        return get_wasserstein_distance(a, b, args)
+    elif cost == "cosine":
+        return F.normalize(a, dim=0) @ F.normalize(b, dim=0).T
+    else:
+        raise NotImplementedError
+
+def get_cost_matrix(x, y, args):
+    """
+    Compute the cost matrix between two measures.
+
+    :param x: list of measures, size m
+    :param y: list of measures, size n
+    :param args: config parameters
+    :return: cost matrix, size m x n
+    """
+
+    cost = args.layer_metric
+    m, n = len(x), len(y)
+    if m * n == 0:
+        return []
+    C = np.zeros((m, n))
+
+    for i in range(m):
+        for j in range(n):
+            C[i][j] = get_cost(x[i], y[j], args, cost=cost)
+
+    return C
