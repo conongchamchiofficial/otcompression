@@ -89,8 +89,6 @@ def get_wassersteinized_layers_modularized(args, networks, activations=None, eps
     print("Num layers: ", num_layers)
 
     for idx0, (layer0_name, fc_layer0_weight) in enumerate(networks[0].named_parameters()):
-        print("layer0_name: ", layer0_name)
-        
         layer0_shape = fc_layer0_weight.shape
         if len(layer0_shape) > 2:
             is_layer0_conv = True
@@ -101,7 +99,6 @@ def get_wassersteinized_layers_modularized(args, networks, activations=None, eps
             fc_layer0_weight_data = fc_layer0_weight.data
             
         for idx1, (layer1_name, fc_layer1_weight) in enumerate(networks[0].named_parameters()):
-            print("layer1_name: ", layer1_name)
             
             layer1_shape = fc_layer1_weight.shape
             # print(layer1_shape)
@@ -113,11 +110,14 @@ def get_wassersteinized_layers_modularized(args, networks, activations=None, eps
                 is_layer1_conv = False
                 fc_layer1_weight_data = fc_layer1_weight.data      
 
-            if idx0 <= idx1:
-                break
+            if idx0 >= idx1:
+                continue
             if is_layer0_conv != is_layer1_conv:
-                break
+                continue
 
+            print("layer0_name: ", layer0_name)
+            print("layer1_name: ", layer1_name)
+            
             if is_layer0_conv:
                 M = ground_metric_object.process(fc_layer0_weight_data.view(fc_layer0_weight_data.shape[0], -1),
                                 fc_layer1_weight_data.view(fc_layer1_weight_data.shape[0], -1))
