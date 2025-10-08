@@ -112,6 +112,8 @@ def get_wassersteinized_layers_modularized(args, networks, activations=None, eps
                 continue
             if is_layer0_conv != is_layer1_conv:
                 continue
+            if fc_layer0_weight_data.view(fc_layer0_weight_data.shape[0], -1).shape != fc_layer1_weight_data.view(fc_layer1_weight_data.shape[0], -1).shape:
+                continue
 
             print("layer0_name: ", layer0_name)
             print("layer1_name: ", layer1_name)
