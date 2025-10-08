@@ -99,9 +99,7 @@ def get_wassersteinized_layers_modularized(args, networks, activations=None, eps
             fc_layer0_weight_data = fc_layer0_weight.data
             
         for idx1, (layer1_name, fc_layer1_weight) in enumerate(networks[0].named_parameters()):
-            
             layer1_shape = fc_layer1_weight.shape
-            # print(layer1_shape)
             if len(layer1_shape) > 2:
                 is_layer1_conv = True
                 # For convolutional layers, it is (#out_channels, #in_channels, height, width)
