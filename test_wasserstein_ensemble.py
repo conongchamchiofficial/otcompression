@@ -118,7 +118,12 @@ def get_wassersteinized_layers_modularized(args, networks, activations=None, eps
             if is_layer0_conv =! is_layer1_conv:
                 break
 
-            
+            if is_layer0_conv:
+                M = ground_metric_object.process(fc_layer0_weight_data.view(fc_layer0_weight_data.shape[0], -1),
+                                fc_layer1_weight_data.view(fc_layer1_weight_data.shape[0], -1))
+            else:
+                M = ground_metric_object.process(fc_layer0_weight_data, fc_layer1_weight_data)
+            print("M: ", M)
                 
     return avg_aligned_layers
 
