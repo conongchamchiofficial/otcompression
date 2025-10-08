@@ -118,6 +118,7 @@ def get_wassersteinized_layers_modularized(args, networks, activations=None, eps
             
             if is_layer0_conv:
                 print(fc_layer0_weight_data.view(fc_layer0_weight_data.shape[0], -1).shape)
+                print(fc_layer1_weight_data.view(fc_layer1_weight_data.shape[0], -1).shape)
                 M = ground_metric_object.process(fc_layer0_weight_data.view(fc_layer0_weight_data.shape[0], -1),
                                 fc_layer1_weight_data.view(fc_layer1_weight_data.shape[0], -1))
             else:
