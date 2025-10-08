@@ -115,7 +115,7 @@ def get_wassersteinized_layers_modularized(args, networks, activations=None, eps
 
             if idx0 <= idx1:
                 break
-            if is_layer0_conv =! is_layer1_conv:
+            if is_layer0_conv != is_layer1_conv:
                 break
 
             if is_layer0_conv:
