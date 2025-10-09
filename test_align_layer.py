@@ -21,6 +21,16 @@ from torch.autograd import Variable
 from wasserstein_ensemble import get_network_from_param_list
 
 
+def get_wasserstein_distance(a, b, args):
+    mu = np.ones(len(a)) / len(a)
+    nu = np.ones(len(b)) / len(b)
+    ground_metric_object = GroundMetric(args)
+    logger.info(f"{a.size()}, {b.size()}")
+    M = ground_metric_object.process(a, b)
+    M_cpu = M.data.cpu().numpy()
+
+    return ot.emd2(mu, nu, M_cpu)
+    
 def get_cost(a, b, args):
     if args.similarity_type == "euclidean":
         return (a - b) ** 2
