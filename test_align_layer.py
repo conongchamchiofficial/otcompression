@@ -2,8 +2,8 @@
 
 import random
 import sys
-from basic_config import PATH_TO_CIFAR
-sys.path.append(PATH_TO_CIFAR)
+# from basic_config import PATH_TO_CIFAR
+# sys.path.append(PATH_TO_CIFAR)
 import time
 
 import numpy as np
