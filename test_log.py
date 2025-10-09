@@ -10,7 +10,7 @@ import logging
 import os
 import time
 
-from basic_config import LOG_DIR, TMP_DATETIME_FILE
+from test_basic_config import LOG_DIR, TMP_DATETIME_FILE
 
 
 TIMESTAMP = datetime.datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d_%H-%M-%S_%f")
