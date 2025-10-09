@@ -130,8 +130,27 @@ def get_parser():
 
     parser.add_argument('--reg', default=1e-2, type=float, help='regularization strength for sinkhorn (default: 1e-2)')
     parser.add_argument('--reg-m', default=1e-3, type=float, help='regularization strength for marginals in unbalanced sinkhorn (default: 1e-3)')
-    parser.add_argument('--similarity-type', type=str, default='euclidean', choices=['euclidean', 'cca', 'cka', 'wd', 'cosine'],
-                        help='similarity type for similarity matrices calculation')    
+    parser.add_argument(
+        '--similarity-type', 
+        type=str, 
+        default='euclidean', 
+        choices=['euclidean', 'cca', 'cka', 'wd', 'cosine'],
+        help='cost function for similarity matrices calculation'
+    )
+    parser.add_argument(
+        '--relu-approx-method', 
+        type=str, 
+        default='sum', 
+        choices=['sum', 'majority', 'avg'],
+        help='method to approximate ReLU'
+    )
+    parser.add_argument(
+        '--layer-measure',
+        type=str,
+        default='neuron',
+        choices=['neuron', 'activation', 'index'],
+        help='type of layer measure',
+    )
     parser.add_argument('--ground-metric', type=str, default='euclidean', choices=['euclidean', 'cosine'],
                         help='ground metric for OT calculations, only works in free support v2 and soon with Ground Metric class in all! .')
     parser.add_argument('--ground-metric-normalize', type=str, default='log', choices=['log', 'max', 'none', 'median', 'mean'],
