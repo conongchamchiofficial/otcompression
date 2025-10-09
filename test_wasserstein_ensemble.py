@@ -8,6 +8,7 @@ from ground_metric import GroundMetric
 import math
 import sys
 import compute_activations
+from test_align_layer import get_cost
 
 def geometric_ensembling_modularized(args, networks, train_loader, test_loader, activations=None):
     
@@ -121,16 +122,15 @@ def get_wassersteinized_layers_modularized(args, networks, activations=None, eps
             if is_layer0_conv:
                 print(fc_layer0_weight_data.view(fc_layer0_weight_data.shape[0], -1).shape)
                 print(fc_layer1_weight_data.view(fc_layer1_weight_data.shape[0], -1).shape)
-                M = ground_metric_object.process(fc_layer0_weight_data.view(fc_layer0_weight_data.shape[0], -1),
-                                fc_layer1_weight_data.view(fc_layer1_weight_data.shape[0], -1))
+                M = get_cost(fc_layer0_weight_data.view(fc_layer0_weight_data.shape[0], -1),
+                                fc_layer1_weight_data.view(fc_layer1_weight_data.shape[0], -1),args)
             else:
-                M = ground_metric_object.process(fc_layer0_weight_data, fc_layer1_weight_data)
+                M = get_cost(fc_layer0_weight_data, fc_layer1_weight_data,args)
             print("M: ", M)
                 
     return avg_aligned_layers
 
-def get_pairwise_similarity_score(args, networks, activations=None, eps=1e-7, test_loader=None):
-    pass
+
 
 
 
