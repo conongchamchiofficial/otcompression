@@ -32,6 +32,7 @@ def get_wasserstein_distance(a, b, args):
     return ot.emd2(mu, nu, M_cpu)
     
 def get_cost(a, b, args):
+    # check the form of eucli/cosin output in matrix, check 1- of sim or dissim of cca cka wd
     if args.similarity_type == "euclidean":
         return (a - b) ** 2
     elif args.similarity_type == "cca":
