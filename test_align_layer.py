@@ -81,6 +81,23 @@ def get_cost_matrix(x, y, args):
 
     for i in range(m):
         for j in range(n):
-            C[i][j] = get_cost(x[i], y[j], args, cost=cost)
+            C[i][j] = get_cost(x[i], y[j], args)
 
     return C
+
+def get_top_k_layers(args, networks, num_layers):
+    """
+    Choose layers to be fused.
+
+    :param args: config parameters
+    :param network: the model
+    :return: 
+    """
+    
+    return 
+
+
+
+
+
+
