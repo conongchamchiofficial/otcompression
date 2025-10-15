@@ -151,6 +151,12 @@ def get_parser():
         choices=['neuron', 'activation', 'index'],
         help='type of layer measure',
     )
+    parser.add_argument(
+        "--longest-model-index",
+        default=0,
+        type=int,
+        help="the position of the longest model to which other models are aligned to",
+    )
     parser.add_argument('--ground-metric', type=str, default='euclidean', choices=['euclidean', 'cosine'],
                         help='ground metric for OT calculations, only works in free support v2 and soon with Ground Metric class in all! .')
     parser.add_argument('--ground-metric-normalize', type=str, default='log', choices=['log', 'max', 'none', 'median', 'mean'],
