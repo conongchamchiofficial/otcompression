@@ -188,6 +188,34 @@ def _get_config(args):
 
     return config, second_config
 
+
 def get_model_size(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
+
+# Add def get_number_of_layers, to_first_position as CLAFusion (not def save_datasets)
+def get_number_of_layers(model):
+    num_layers = 0
+
+    for layer_name, _ in model.named_parameters():
+        # shortcut 1 is also batchnorm
+        if (
+            ("bias" in layer_name)
+            or ("bn" in layer_name)
+            or ("shortcut.1" in layer_name)
+            or ("BatchNorm2d" in layer_name)
+        ):
+            continue
+
+        num_layers += 1
+
+    return num_layers
+
+
+def to_first_position(arr, idx):
+    tmp = arr[0]
+    arr[0] = arr[idx]
+    arr[idx] = tmp
+
+    return arr
+    
