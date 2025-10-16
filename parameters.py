@@ -157,6 +157,12 @@ def get_parser():
         type=int,
         help="the position of the longest model to which other models are aligned to",
     )
+    parser.add_argument(
+        "--model-name-list",
+        type=lambda xs: xs.split("; "),
+        default=[],
+        help='list of model names, e.g. "mlpnet; mlpnet"; "vgg11_nobias; vgg13_nobias"',
+    )
     parser.add_argument('--ground-metric', type=str, default='euclidean', choices=['euclidean', 'cosine'],
                         help='ground metric for OT calculations, only works in free support v2 and soon with Ground Metric class in all! .')
     parser.add_argument('--ground-metric-normalize', type=str, default='log', choices=['log', 'max', 'none', 'median', 'mean'],
