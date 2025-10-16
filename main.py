@@ -30,7 +30,7 @@ if __name__ == '__main__':
     config_list = utils._get_config(args)
     # Move the longest model to the first position
     config_list = utils.to_first_position(config_list, args.longest_model_index)
-    args.model_name_list = utils.to_first_position(args.model_name_list, args.longest_model_index)
+    #args.model_name_list = utils.to_first_position(args.model_name_list, args.longest_model_index)
     args.config = config_list[0]
     args.second_config = config_list[1]
 
@@ -68,8 +68,12 @@ if __name__ == '__main__':
 
         for idx in range(args.num_models):
             print("loading model with idx {} and checkpoint_type is {}".format(idx, args.ckpt_type))
+
+            if idx == 0:
+                model_name = args.model_name
+            elif idx == 1:
+                model_name = args.second_model_name
             
-            model_name = args.model_name_list[idx]
             if args.dataset.lower()[0:7] == 'cifar10' and (model_name.lower()[0:5] == 'vgg11' or model_name.lower()[0:6] == 'resnet'):
                 if idx == 0:
                     config_used = config_list[0]
