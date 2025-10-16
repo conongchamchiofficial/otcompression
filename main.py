@@ -53,14 +53,14 @@ if __name__ == '__main__':
             train_loader, test_loader = get_dataloader(args)
             retrain_loader, _ = get_dataloader(args, no_randomness=args.no_random_trainloaders)
         elif args.dataset.lower()[0:7] == 'cifar10':
-            args.cifar_init_lr = config['optimizer_learning_rate']
+            args.cifar_init_lr = config_list[0]['optimizer_learning_rate']
             if args.second_model_name is not None:
-                assert second_config is not None
-                assert args.cifar_init_lr == second_config['optimizer_learning_rate']
+                assert config_list[1] is not None
+                assert args.cifar_init_lr == config_list[1]['optimizer_learning_rate']
                 # also the below things should be fine as it is just dataloader loading!
             print('loading {} dataloaders'.format(args.dataset.lower()))
-            train_loader, test_loader = cifar_train.get_dataset(config)
-            retrain_loader, _ = cifar_train.get_dataset(config, no_randomness=args.no_random_trainloaders)
+            train_loader, test_loader = cifar_train.get_dataset(config_list[0])
+            retrain_loader, _ = cifar_train.get_dataset(config_list[0], no_randomness=args.no_random_trainloaders)
 
 
         models = []
@@ -72,9 +72,9 @@ if __name__ == '__main__':
             model_name = args.model_name_list[idx]
             if args.dataset.lower()[0:7] == 'cifar10' and (model_name.lower()[0:5] == 'vgg11' or model_name.lower()[0:6] == 'resnet'):
                 if idx == 0:
-                    config_used = config
+                    config_used = config_list[0]
                 elif idx == 1:
-                    config_used = second_config
+                    config_used = config_list[1]
                     
                 model, accuracy = cifar_train.get_pretrained_model(
                     config_used,
@@ -129,7 +129,7 @@ if __name__ == '__main__':
     # second_config is not needed here as well, since it's just used for the dataloader!
     print("Activation Timer start")
     st_time = time.perf_counter()
-    activations = utils.get_model_activations(args, models, config=config)
+    activations = utils.get_model_activations(args, models, config=config_list[0])
     end_time = time.perf_counter()
     setattr(args, 'activation_time', end_time - st_time)
     print("Activation Timer ends")
@@ -204,7 +204,7 @@ if __name__ == '__main__':
                 initial_acc = [geometric_acc]
                 nicks = ['geometric']
                 _, best_retrain_acc = routines.retrain_models(args, [geometric_model], retrain_loader,
-                                                              test_loader, config, tensorboard_obj=tensorboard_obj,
+                                                              test_loader, config_list[0], tensorboard_obj=tensorboard_obj,
                                                               initial_acc=initial_acc, nicks=nicks)
                 args.retrain_geometric_best = best_retrain_acc[0]
                 args.retrain_naive_best = -1
@@ -213,7 +213,7 @@ if __name__ == '__main__':
                     initial_acc = [geometric_acc]
                     nicks = ['geometric']
                     _, best_retrain_acc = routines.retrain_models(args, [geometric_model],
-                                                                  retrain_loader, test_loader, config,
+                                                                  retrain_loader, test_loader, config_list[0],
                                                                   tensorboard_obj=tensorboard_obj,
                                                                   initial_acc=initial_acc, nicks=nicks)
                     args.retrain_geometric_best = best_retrain_acc[0]
@@ -221,7 +221,7 @@ if __name__ == '__main__':
                 else:
                     nicks = ['geometric', 'naive_averaging']
                     initial_acc = [geometric_acc, naive_acc]
-                    _, best_retrain_acc = routines.retrain_models(args, [geometric_model, naive_model], retrain_loader, test_loader, config, tensorboard_obj=tensorboard_obj, initial_acc=initial_acc, nicks=nicks)
+                    _, best_retrain_acc = routines.retrain_models(args, [geometric_model, naive_model], retrain_loader, test_loader, config_list[0], tensorboard_obj=tensorboard_obj, initial_acc=initial_acc, nicks=nicks)
                     args.retrain_geometric_best = best_retrain_acc[0]
                     args.retrain_naive_best = best_retrain_acc[1]
 
@@ -250,13 +250,13 @@ if __name__ == '__main__':
                 nicks = original_nicks + ['geometric']
                 initial_acc = original_accuracies + [geometric_acc]
                 _, best_retrain_acc = routines.retrain_models(args, [*original_models, geometric_model],
-                                                              retrain_loader, test_loader, config,
+                                                              retrain_loader, test_loader, config_list[0],
                                                               tensorboard_obj=tensorboard_obj, initial_acc=initial_acc, nicks=nicks)
                 args.retrain_naive_best = -1
             else:
                 nicks = original_nicks + ['geometric', 'naive_averaging']
                 initial_acc = [*original_accuracies, geometric_acc, naive_acc]
-                _, best_retrain_acc = routines.retrain_models(args, [*original_models, geometric_model, naive_model], retrain_loader, test_loader, config, tensorboard_obj=tensorboard_obj, initial_acc=initial_acc, nicks=nicks)
+                _, best_retrain_acc = routines.retrain_models(args, [*original_models, geometric_model, naive_model], retrain_loader, test_loader, config_list[0], tensorboard_obj=tensorboard_obj, initial_acc=initial_acc, nicks=nicks)
                 args.retrain_naive_best = best_retrain_acc[len(initial_acc)-1]
 
             if args.skip_retrain == 0:
