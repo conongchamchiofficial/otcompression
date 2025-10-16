@@ -37,12 +37,6 @@ if __name__ == '__main__':
     # obtain trained models
     if args.load_models != '':
         print("------- Loading pre-trained models -------")
-
-        # currently mnist is not supported!
-        # assert args.dataset != 'mnist'
-
-        # ensemble_experiment = "exp_2019-04-23_18-08-48/"
-        # ensemble_experiment = "exp_2019-04-24_02-20-26"
         
         ensemble_experiment = args.load_models.split('/')
         if len(ensemble_experiment) > 1:
@@ -74,20 +68,23 @@ if __name__ == '__main__':
 
         for idx in range(args.num_models):
             print("loading model with idx {} and checkpoint_type is {}".format(idx, args.ckpt_type))
-
-            if args.dataset.lower()[0:7] == 'cifar10' and (args.model_name.lower()[0:5] == 'vgg11' or args.model_name.lower()[0:6] == 'resnet'):
+            
+            model_name = args.model_name_list[idx]
+            if args.dataset.lower()[0:7] == 'cifar10' and (model_name.lower()[0:5] == 'vgg11' or model_name.lower()[0:6] == 'resnet'):
                 if idx == 0:
                     config_used = config
                 elif idx == 1:
                     config_used = second_config
                     
                 model, accuracy = cifar_train.get_pretrained_model(
-                        config_used, os.path.join(ensemble_dir, 'model_{}/{}.checkpoint'.format(idx, args.ckpt_type)),
-                        args.gpu_id, relu_inplace=not args.prelu_acts # if you want pre-relu acts, set relu_inplace to False
+                    config_used,
+                    os.path.join(ensemble_dir, 'model_{}/{}.checkpoint'.format(idx, args.ckpt_type)),
+                    args.gpu_id,
+                    relu_inplace=not args.prelu_acts # if you want pre-relu acts, set relu_inplace to False
                 )
             else:
                 model, accuracy = routines.get_pretrained_model(
-                        args, os.path.join(ensemble_dir, 'model_{}/{}.checkpoint'.format(idx, args.ckpt_type)), idx = idx
+                    args, os.path.join(ensemble_dir, 'model_{}/{}.checkpoint'.format(idx, args.ckpt_type)), idx = idx
                 )
 
             models.append(model)
