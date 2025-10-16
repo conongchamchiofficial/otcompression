@@ -151,6 +151,24 @@ if __name__ == '__main__':
     NUMPY_SEED = 100
     np.random.seed(NUMPY_SEED)
 
+
+    # run model compression
+    print("------- Model Compression -------")
+
+    print("Timer start")
+    st_time = time.perf_counter()
+
+    #check model_compression.geometric_ensembling_modularized
+    compressed_acc, compressed_model = model_compression.geometric_ensembling_modularized(args, models, train_loader, test_loader, activations)
+    
+    end_time = time.perf_counter()
+    print("Timer ends")
+    setattr(args, 'compression_time', end_time - st_time)
+    args.params_geometric = utils.get_model_size(compressed_model)
+
+    print("Time taken for model compression is {} seconds".format(str(end_time - st_time)))    
+
+    
     # run geometric aka wasserstein ensembling
     print("------- Geometric Ensembling -------")
     # Deprecated: wasserstein_ensemble.geometric_ensembling(models, train_loader, test_loader)
