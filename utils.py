@@ -186,7 +186,7 @@ def _get_config(args):
     else:
         second_config = config
 
-    return config, second_config
+    return [config, second_config]
 
 
 def get_model_size(model):
