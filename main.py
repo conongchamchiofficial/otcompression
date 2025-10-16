@@ -30,7 +30,7 @@ if __name__ == '__main__':
     config_list = utils._get_config(args)
     # Move the longest model to the first position
     config_list = utils.to_first_position(config_list, args.longest_model_index)
-    args.model_name_list = utils.to_first_position(args.model_name_list, args.longest_model_index)
+    #args.model_name_list = utils.to_first_position(args.model_name_list, args.longest_model_index)
     args.config = config_list[0]
     args.second_config = config_list[1]
 
