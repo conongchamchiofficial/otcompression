@@ -1,3 +1,6 @@
+def 
+
+
 def compress_model(args, networks, accuracies, num_layers, model_names=None):
   """
   Compress deeper model to be the same size of smaller one
@@ -22,6 +25,11 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     print("Model {} has accuracy of {} with {} layers and parameters".format(i, accuracies[i],num_layers[i]))
     print(networks)
 
+  return args, networks, accuracies, num_layers, model_names
+
+
+
+  
   
 
   
