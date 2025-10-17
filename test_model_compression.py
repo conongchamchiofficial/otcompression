@@ -21,7 +21,7 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     model_names = model_names[::-1]
 
   print("------ Before compression ------")
-  for i, network in enumerate(networks)
+  for i, network in enumerate(networks):
     print("Model {} has accuracy of {} with {} layers and parameters".format(i, accuracies[i],num_layers[i]))
     print(networks)
 
