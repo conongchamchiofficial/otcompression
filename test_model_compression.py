@@ -1,4 +1,4 @@
-def 
+#def 
 
 
 def compress_model(args, networks, accuracies, num_layers, model_names=None):
