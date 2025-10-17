@@ -144,10 +144,10 @@ if __name__ == '__main__':
         setattr(args, f'params_model_{idx}', utils.get_model_size(model))
 
     for idx, model in enumerate(models):
-        num_layers[idx] = utils.get_number_of_layers(models[i])
-        print("Model {} has {} layers".format(i,num_layers[idx]))
-        print(models[i])
-        print(config_list[i])
+        num_layers[idx] = utils.get_number_of_layers(models[idx])
+        print("Model {} has {} layers".format(idx, num_layers[idx]))
+        print(models[idx])
+        print(config_list[idx])
     # if args.ensemble_iter == 1:
     #
     # else:
