@@ -66,6 +66,7 @@ if __name__ == '__main__':
 
         models = []
         accuracies = []
+        num_layers = []
 
         for idx in range(args.num_models):
             print("loading model with idx {} and checkpoint_type is {}".format(idx, args.ckpt_type))
@@ -142,6 +143,11 @@ if __name__ == '__main__':
     for idx, model in enumerate(models):
         setattr(args, f'params_model_{idx}', utils.get_model_size(model))
 
+    for idx, model in enumerate(models):
+        num_layers[idx] = utils.get_number_of_layers(models[i])
+        print("Model {} has {} layers".format(i,num_layers[idx]))
+        print(models[i])
+        print(config_list[i])
     # if args.ensemble_iter == 1:
     #
     # else:
