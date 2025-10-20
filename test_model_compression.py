@@ -1,3 +1,23 @@
+import random
+import sys
+from basic_config import PATH_TO_CIFAR
+sys.path.append(PATH_TO_CIFAR)
+import time
+
+import numpy as np
+import ot
+import routines
+import torch
+import torch.nn.functional as F
+import train as cifar_train
+import utils
+from data import get_dataloader
+from ground_metric import GroundMetric
+from layer_similarity import cca, cka, gram_linear
+# from log import logger
+from torch.autograd import Variable
+# from wasserstein_ensemble import get_network_from_param_list
+
 def get_wasserstein_distance(a, b, args):
     mu = np.ones(len(a)) / len(a)
     nu = np.ones(len(b)) / len(b)
@@ -47,14 +67,31 @@ def get_cost_matrix(x, y, args):
   return cost_matrix
 
 
-def align_layers(cost, ):
+def get_cost_matrix_conv_layer(x, y, args):
+  """
+  Compute the cost matrix between two measures of convolutional layers
 
+  :param x: list of measures, size m
+  :param y: list of measures, size n
+  :param args: config parameters
+  :return: cost matrix, size m x n
+  """
 
-def align_conv_layers(cost, ):
+  layer_metric = args.layer_metric
+  m, n = len(x), len(y)
+  if m * n == 0:
+    return []
+  
+  cost_matrix = np.zeros((m, n))
+  for i in range(m):
+    for j in range(n):
+      cost_matrix[i][j] = get_cost(x[i], y[j], args, layer_metric)
+
+  return cost_matrix
   
 
 
-def get_alignment_map(args, networks, num_layers, model_names):
+def get_dissimilarity_matrix(args, networks, num_layers, model_names):
   """
   Calculate dissimilarity index among layers in the large model
 
@@ -96,19 +133,21 @@ def get_alignment_map(args, networks, num_layers, model_names):
     classifier_idx[i] = idx
     print(f"FC layers of model {i} start from {idx}")
 
-  # get alignment map among layers of model 0
+  # get dissimilarity matrix among layers of model 0
   if classifier_idx[0] > 0:
     if "vgg" in model_names[0]:
-      map1 = align_conv_layers()
+      mat1 = align_conv_layers()
     elif "resnet" in model_names[0]:
-      map1 = align_resnet_block()
+      mat1 = align_resnet_block()
     else:
       raise NotImplementedError
 
     if classifier_idx[0] < len(x):
-      cost = get_cost_matrix()
-      print("Cost matrix between layers {}-{} of model 0 and layers {}-{} of model 1 is \n{}".format(
-        classifier_idx[0] + 1, len(x), classifier_idx[1] + 1, len(y), cost")
+      mat2 = get_cost_matrix()
+      print("Cost matrix between layers {}-{} of model 0 is \n{}".format(
+          classifier_idx[0] + 1, len(x), classifier_idx[1] + 1, len(y), mat2")
+      map2 = 
+          
       
 
 def compress_model(args, networks, accuracies, num_layers, model_names=None):
@@ -135,7 +174,7 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     print("Model {} has accuracy of {} with {} layers and parameters".format(i, accuracies[i],num_layers[i]))
     print(networks)
 
-  alignment_map = get_alignment_map(args, networks, num_layers, model_names)
+  dissimilarity_matrix = get_dissimilarity_matrix(args, networks, num_layers, model_names)
   
   return args, networks, accuracies, num_layers, model_names
 
