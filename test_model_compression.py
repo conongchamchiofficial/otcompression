@@ -1,4 +1,60 @@
-def get_dissimilarity_matrix(args, networks, num_layers, model_names):
+def get_wasserstein_distance(a, b, args):
+    mu = np.ones(len(a)) / len(a)
+    nu = np.ones(len(b)) / len(b)
+    ground_metric_object = GroundMetric(args)
+    print(f"{a.size()}, {b.size()}")
+    M = ground_metric_object.process(a, b)
+    M_cpu = M.data.cpu().numpy()
+
+    return ot.emd2(mu, nu, M_cpu)
+
+
+def get_cost(x, y, args, layer_metric):
+  if layer_metric == "euclidean":
+    return (a - b) ** 2
+  elif layer_metric == "cca":
+    return 1 - cca(a, b)
+  elif layer_metric == "cka":
+    return 1 - cka(gram_linear(a), gram_linear(b))
+  elif layer_metric == "wd":
+    return get_wasserstein_distance(a, b, args)
+  elif layer_metric == "cosine":
+    return F.normalize(a, dim=0) @ F.normalize(b, dim=0).T
+  else:
+    raise NotImplementedError
+
+
+def get_cost_matrix(x, y, args):
+  """
+  Compute the cost matrix between two measures
+
+  :param x: list of measures, size m
+  :param y: list of measures, size n
+  :param args: config parameters
+  :return: cost matrix, size m x n
+  """
+
+  layer_metric = args.layer_metric
+  m, n = len(x), len(y)
+  if m * n == 0:
+    return []
+  
+  cost_matrix = np.zeros((m, n))
+  for i in range(m):
+    for j in range(n):
+      cost_matrix[i][j] = get_cost(x[i], y[j], args, layer_metric)
+
+  return cost_matrix
+
+
+def align_layers(cost, ):
+
+
+def align_conv_layers(cost, ):
+  
+
+
+def get_alignment_map(args, networks, num_layers, model_names):
   """
   Calculate dissimilarity index among layers in the large model
 
@@ -16,7 +72,7 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names):
   # get layer representation of models (check x, y for layers within model)
   layer_representations = []
   if args.layer_measure == "index":
-    layer_representation = np.arange(1, num_layers[0])
+    layer_representation = np.arange(1, num_layers[0] - 1)
     layer_representations.append(layer_representation)
     assert args.layer_metric == "euclidean"
   elif args.layer_measure == "neuron":
@@ -39,6 +95,21 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names):
         break
     classifier_idx[i] = idx
     print(f"FC layers of model {i} start from {idx}")
+
+  # get alignment map among layers of model 0
+  if classifier_idx[0] > 0:
+    if "vgg" in model_names[0]:
+      map1 = align_conv_layers()
+    elif "resnet" in model_names[0]:
+      map1 = align_resnet_block()
+    else:
+      raise NotImplementedError
+
+    if classifier_idx[0] < len(x):
+      cost = get_cost_matrix()
+      print("Cost matrix between layers {}-{} of model 0 and layers {}-{} of model 1 is \n{}".format(
+        classifier_idx[0] + 1, len(x), classifier_idx[1] + 1, len(y), cost")
+      
 
 def compress_model(args, networks, accuracies, num_layers, model_names=None):
   """
@@ -64,7 +135,7 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     print("Model {} has accuracy of {} with {} layers and parameters".format(i, accuracies[i],num_layers[i]))
     print(networks)
 
-  dissimilarity_matrix = get_dissimilarity_matrix(args, networks, num_layers, model_names)
+  alignment_map = get_alignment_map(args, networks, num_layers, model_names)
   
   return args, networks, accuracies, num_layers, model_names
 
