@@ -169,7 +169,7 @@ if __name__ == '__main__':
     st_time = time.perf_counter()
 
     #check model_compression.geometric_ensembling_modularized
-    args, networks, accuracies, num_layers, model_names = compress_model(args, networks, accuracies, num_layers, model_names)
+    args, models, accuracies, num_layers, model_names = compress_model(args, copy.deepcopy(models), accuracies, num_layers, model_names)
     
     end_time = time.perf_counter()
     print("Timer ends")
