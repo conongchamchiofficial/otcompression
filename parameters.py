@@ -138,6 +138,13 @@ def get_parser():
         help='cost function for similarity matrices calculation'
     )
     parser.add_argument(
+        '--layer-metric', 
+        type=str, 
+        default='euclidean', 
+        choices=['euclidean', 'cca', 'cka', 'wd', 'cosine'],
+        help='cost function for similarity matrices calculation'
+    )
+    parser.add_argument(
         '--relu-approx-method', 
         type=str, 
         default='sum', 
