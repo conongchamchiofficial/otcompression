@@ -5,7 +5,7 @@ import baseline
 import wasserstein_ensemble
 import os
 import utils
-import test_model_compression
+from test_model_compression import compress_model
 import numpy as np
 import sys
 import torch
@@ -31,6 +31,7 @@ if __name__ == '__main__':
     config_list = utils._get_config(args)
     # Move the longest model to the first position
     config_list = utils.to_first_position(config_list, args.longest_model_index)
+    model_names = [args.model_name] + [args.second_model_name]
     #args.model_name_list = utils.to_first_position(args.model_name_list, args.longest_model_index)
     args.config = config_list[0]
     args.second_config = config_list[1]
@@ -168,7 +169,7 @@ if __name__ == '__main__':
     st_time = time.perf_counter()
 
     #check model_compression.geometric_ensembling_modularized
-    compressed_acc, compressed_model = test_model_compression.geometric_ensembling_modularized(args, models, train_loader, test_loader, activations)
+    compressed_acc, compressed_model = test_model_compression.compress_model(args, networks, accuracies, num_layers, model_names):
     
     end_time = time.perf_counter()
     print("Timer ends")
