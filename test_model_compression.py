@@ -136,7 +136,7 @@ def get_cost_matrix_conv_layer(x, model_name, args, dissimilarity_matrix):
             cost_matrix = get_cost_matrix(x[layer_idx[idx] : layer_idx[idx + 1]], x[layer_idx[idx] : layer_idx[idx + 1]], args)
             dissimilarity_matrix[layer_idx[idx] : layer_idx[idx + 1], layer_idx[idx] : layer_idx[idx + 1]] = cost_matrix
 
-  return dissimilarity_matrix
+    return dissimilarity_matrix
   
 
 
