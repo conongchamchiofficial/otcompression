@@ -13,7 +13,7 @@ import train as cifar_train
 import utils
 from data import get_dataloader
 from ground_metric import GroundMetric
-from layer_similarity import cca, cka, gram_linear
+from test_layer_similarity import cca, cka, gram_linear
 # from log import logger
 from torch.autograd import Variable
 # from wasserstein_ensemble import get_network_from_param_list
