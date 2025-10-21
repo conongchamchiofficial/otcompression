@@ -218,11 +218,11 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     """
     
     if num_layers[0] < num_layers[1]:
-    print("Shuffle two models so that model 0 has more layers than model 1")
-    networks = networks[::-1]
-    accuracies = accuracies[::-1]
-    num_layers = num_layers[::-1]
-    model_names = model_names[::-1]
+        print("Shuffle two models so that model 0 has more layers than model 1")
+        networks = networks[::-1]
+        accuracies = accuracies[::-1]
+        num_layers = num_layers[::-1]
+        model_names = model_names[::-1]
 
     print("------ Before compression ------")
     for i, network in enumerate(networks):
