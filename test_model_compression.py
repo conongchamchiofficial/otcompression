@@ -58,7 +58,7 @@ def get_cost_matrix(x, args):
     if m * m == 0:
         return []
   
-    cost_matrix = np.full((m, m), None)
+    cost_matrix = np.full((m, m), np.inf)
     for i in range(m):
         for j in range(i, m):
             cost_matrix[i][j] = get_cost(x[i], y[j], args, layer_metric)
@@ -66,7 +66,7 @@ def get_cost_matrix(x, args):
     return cost_matrix
 
 
-def get_cost_matrix_conv_layer(x, y, model_name, args):
+def get_cost_matrix_conv_layer(x, y, model_name, args, dissimilarity_matrix):
     """
     Compute the cost matrix between two measures of convolutional layers
     
@@ -77,6 +77,7 @@ def get_cost_matrix_conv_layer(x, y, model_name, args):
     """
     assert "vgg" in model_name
     layer_idx = []
+    cost_matrices = []
     
     model_config = vgg_cfg[name.split("_")[0]]
     idx = 0
@@ -88,8 +89,13 @@ def get_cost_matrix_conv_layer(x, y, model_name, args):
     layer_idx = [0] + layer_idx
 
     for idx in range(len(layer_idx) - 1):
-        cost_matrix = get_cost_matrix(x[layer_idx[idx] : layer_idx[idx] + 1], x[layer_idx[idx] : layer_idx[idx] + 1], args)
-  return cost_matrix
+        if layer_idx[idx + 1] - layer_idx[idx] > 1:
+            cost_matrix = get_cost_matrix(x[layer_idx[idx] : layer_idx[idx + 1]], x[layer_idx[idx] : layer_idx[idx + 1]], args)
+            cost_matrices.append(cost_matrix)
+
+    for i in range 
+    
+  return dissimilarity_matrix
   
 
 
@@ -107,6 +113,9 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names):
     # act_time = 0
     # align_time = 0
     # align_st_time = time.perf_counter()
+
+    # initialize dissmilarity matrix
+    dissimilarity_matrix = = np.full((num_layers[0], num_layers[0]), np.inf)
     
     # get layer representation of models (check x, y for layers within model)
     layer_representations = []
