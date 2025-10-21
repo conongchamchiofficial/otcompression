@@ -66,18 +66,16 @@ def get_cost_matrix(x, args):
     return cost_matrix
 
 
-def get_cost_matrix_conv_layer(x, y, model_name, args, dissimilarity_matrix):
+def get_cost_matrix_conv_layer(x, model_name, args, dissimilarity_matrix):
     """
     Compute the cost matrix between two measures of convolutional layers
     
     :param x: list of measures, size m
-    :param y: list of measures, size n
     :param args: config parameters
     :return: cost matrix, size m x n
     """
     assert "vgg" in model_name
     layer_idx = []
-    cost_matrices = []
     
     model_config = vgg_cfg[name.split("_")[0]]
     idx = 0
@@ -91,10 +89,8 @@ def get_cost_matrix_conv_layer(x, y, model_name, args, dissimilarity_matrix):
     for idx in range(len(layer_idx) - 1):
         if layer_idx[idx + 1] - layer_idx[idx] > 1:
             cost_matrix = get_cost_matrix(x[layer_idx[idx] : layer_idx[idx + 1]], x[layer_idx[idx] : layer_idx[idx + 1]], args)
-            cost_matrices.append(cost_matrix)
+            dissimilarity_matrix[layer_idx[idx] : layer_idx[idx + 1], layer_idx[idx] : layer_idx[idx + 1]] = cost_matrix
 
-    for i in range 
-    
   return dissimilarity_matrix
   
 
@@ -147,18 +143,22 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names):
     # get dissimilarity matrix among layers of model 0
     if classifier_idx[0] > 0:
         if "vgg" in model_names[0]:
-            mat1 = align_conv_layers()
+            dissimilarity_matrix = get_cost_matrix_conv_layer(x[: classifier_idx[0]], model_names[0], args, dissimilarity_matrix)
         elif "resnet" in model_names[0]:
-            mat1 = align_resnet_block()
+            dissimilarity_matrix = get_cost_matrix_resnet_block(x[: classifier_idx[0]], model_names[0], args, dissimilarity_matrix)
         else:
             raise NotImplementedError
 
-    if classifier_idx[0] < len(x):
-        mat2 = get_cost_matrix()
-        print("Cost matrix between layers {}-{} of model 0 is \n{}".format(classifier_idx[0] + 1, len(x), classifier_idx[1] + 1, len(y), mat2")
-        map2 = 
-          
-      
+        if classifier_idx[0] < len(x):
+            dissimilarity_matrix = get_cost_matrix(x[classifier_idx[0] :], args)
+            print("Cost matrix between layers {}-{} of model 0 is \n{}".format(classifier_idx[0] + 1, len(x), dissimilarity_matrix)
+    else:
+        dissimilarity_matrix = get_cost_matrix(x[classifier_idx[0] :], args)
+        print("Cost matrix between layers {}-{} of model 0 is \n{}".format(classifier_idx[0] + 1, len(x), dissimilarity_matrix)
+
+    print("Optimal map from model 1 to model 0 is {}".format(dissimilarity_matrix))
+
+    return dissimilarity_matrix
 
 def compress_model(args, networks, accuracies, num_layers, model_names=None):
     """
