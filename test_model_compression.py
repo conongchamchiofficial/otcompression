@@ -156,7 +156,7 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names):
     # align_st_time = time.perf_counter()
 
     # initialize dissmilarity matrix
-    dissimilarity_matrix = = np.full((num_layers[0], num_layers[0]), np.inf)
+    dissimilarity_matrix = np.full((num_layers[0], num_layers[0]), np.inf)
     
     # get layer representation of models (check x, y for layers within model)
     layer_representations = []
