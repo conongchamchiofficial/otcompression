@@ -18,6 +18,51 @@ from layer_similarity import cca, cka, gram_linear
 from torch.autograd import Variable
 # from wasserstein_ensemble import get_network_from_param_list
 
+def get_number_of_neurons(network):
+    """
+    Get number of neurons of each hidden layer in MLPNet
+
+    :param netwokrs: a network
+    """
+    n_neurons = []
+
+    for _, layer_weight in network.named_parameters():
+        n_neurons.append(layer_weight.size(0))
+
+    return np.array(n_neurons)[:-1]
+
+
+def get_activation_matrices(args, networks, personal_dataset=None, config=None, is_wd=False):
+    """
+    Get activation matrix for each layer of each network
+
+    :param args: config parameters
+    :param networks: list of networks
+    :param personal_dataset: personalized dataset
+    :param config: hyperparameters for CNNs, default = None
+    :param is_wd: whether the cost is Wassersten distance
+    :return: list of activation matrices for each model
+    """
+    activations = utils.get_model_activations(args, networks, personal_dataset=personal_dataset, config=config)
+    list_act = []
+
+    for _, model_dict in activations.items():
+        model_act = []
+
+        for _, layer_act in model_dict.items():
+            if is_wd:
+                reorder_dim = [l for l in range(2, len(layer_act.shape))]
+                reorder_dim.extend([0, 1])
+                layer_act = layer_act.permute(*reorder_dim).contiguous()
+            layer_act = layer_act.view(layer_act.size(0), -1)
+            model_act.append(layer_act)
+
+        # exclude the activation of output layer
+        list_act.append(model_act[:-1])
+
+    return list_act
+
+
 def get_wasserstein_distance(a, b, args):
     mu = np.ones(len(a)) / len(a)
     nu = np.ones(len(b)) / len(b)
@@ -72,7 +117,7 @@ def get_cost_matrix_conv_layer(x, model_name, args, dissimilarity_matrix):
     
     :param x: list of measures, size m
     :param args: config parameters
-    :return: cost matrix, size m x n
+    :return: cost matrix, size m x m
     """
     assert "vgg" in model_name
     layer_idx = []
@@ -144,8 +189,8 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names):
     if classifier_idx[0] > 0:
         if "vgg" in model_names[0]:
             dissimilarity_matrix = get_cost_matrix_conv_layer(x[: classifier_idx[0]], model_names[0], args, dissimilarity_matrix)
-        elif "resnet" in model_names[0]:
-            dissimilarity_matrix = get_cost_matrix_resnet_block(x[: classifier_idx[0]], model_names[0], args, dissimilarity_matrix)
+        # elif "resnet" in model_names[0]:
+        #     dissimilarity_matrix = get_cost_matrix_resnet_block(x[: classifier_idx[0]], model_names[0], args, dissimilarity_matrix)
         else:
             raise NotImplementedError
 
