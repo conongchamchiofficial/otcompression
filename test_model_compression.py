@@ -177,7 +177,7 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names):
         assert args.layer_metric in ["cka", "cca", "wd"]
 
     # separate where is the FC layer start
-    classifier_idx = [None, None]
+    classifier_idx = [0, 0]
     for i in range(2):
         for idx, (_, layer_weight) in enumerate(networks[i].named_parameters()):
             if len(layer_weight.shape) == 2:
