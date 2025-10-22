@@ -74,7 +74,7 @@ def get_wasserstein_distance(a, b, args):
     return ot.emd2(mu, nu, M_cpu)
 
 
-def get_cost(x, y, args, layer_metric):
+def get_cost(a, b, args, layer_metric):
     if layer_metric == "euclidean":
         return (a - b) ** 2
     elif layer_metric == "cca":
