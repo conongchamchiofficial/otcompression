@@ -106,7 +106,7 @@ def get_cost_matrix(x, args):
     cost_matrix = np.full((m, m), np.inf)
     for i in range(m):
         for j in range(i, m):
-            cost_matrix[i][j] = get_cost(x[i], y[j], args, layer_metric)
+            cost_matrix[i][j] = get_cost(x[i], x[j], args, layer_metric)
 
     return cost_matrix
 
