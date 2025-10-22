@@ -177,7 +177,7 @@ if __name__ == '__main__':
     end_time = time.perf_counter()
     print("Timer ends")
     setattr(args, 'compression_time', end_time - st_time)
-    args.params_geometric = utils.get_model_size(compressed_model)
+    args.params_geometric = utils.get_model_size(models[0])
 
     print("Time taken for model compression is {} seconds".format(str(end_time - st_time)))    
 
