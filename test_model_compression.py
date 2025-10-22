@@ -161,12 +161,11 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names):
     # get layer representation of models (check x, y for layers within model)
     layer_representations = []
     if args.layer_measure == "index":
-        layer_representation = np.arange(1, num_layers[0] - 1)
-        layer_representations.append(layer_representation)
+        x = np.arange(1, num_layers[0] - 1)
+        # layer_representations.append(layer_representation)
         assert args.layer_metric == "euclidean"
     elif args.layer_measure == "neuron":
-        layer_representation = get_number_of_neurons(networks[0])
-        layer_representations.append(layer_representation)
+        x = get_number_of_neurons(networks[0])
         assert args.layer_metric == "euclidean"
     elif args.layer_measure == "activation":
         # act_st_time = time.perf_counter()
