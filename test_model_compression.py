@@ -141,7 +141,7 @@ def get_cost_matrix_conv_layer(x, model_name, args, dissimilarity_matrix):
   
 
 
-def get_dissimilarity_matrix(args, networks, num_layers, model_names):
+def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_dataset=None):
     """
     Calculate dissimilarity index among layers in the large model
     
