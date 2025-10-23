@@ -31,6 +31,22 @@ def get_number_of_neurons(network):
 
     return np.array(n_neurons)[:-1]
 
+    return np.array(n_neurons)[:-1]
+
+
+def get_weight_matrices(network):
+    """
+    Get weights of each hidden layer in MLPNet
+
+    :param netwokrs: a network
+    """
+    model_weights = []
+
+    for _, layer_weight in network.named_parameters():
+        model_weights.append(layer_weight)
+
+    return model_weights
+
 
 def get_activation_matrices(args, networks, personal_dataset=None, config=None, is_wd=False):
     """
@@ -170,6 +186,10 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
         x = get_number_of_neurons(networks[0])
         y = get_number_of_neurons(networks[1])
         assert args.layer_metric == "euclidean"
+    elif args.layer_measure == "weight":
+        x = get_weight_matrices(networks[0])
+        y = get_weight_matrices(networks[1])
+        assert args.layer_metric in ["cka", "cca", "wd"]
     elif args.layer_measure == "activation":
         # act_st_time = time.perf_counter()
         is_wd = args.layer_metric == "wd"
