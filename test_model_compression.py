@@ -157,7 +157,7 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names):
 
     # initialize dissmilarity matrix
     dissimilarity_matrix = np.full((num_layers[0], num_layers[0]), np.inf)
-    
+    print("dissimilarity_matrix: ", dissimilarity_matrix)
     # get layer representation of models (check x, y for layers within model)
     layer_representations = []
     if args.layer_measure == "index":
