@@ -198,10 +198,11 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names):
 
         if classifier_idx[0] < len(x):
             dissimilarity_matrix = get_cost_matrix(x[classifier_idx[0] :], args)
-            print("Cost matrix between layers {}-{} of model 0 is \n{}".format(classifier_idx[0] + 1, len(x), dissimilarity_matrix))
+            print("Cost matrix between layers {}-{} of model 0 is \n{}".format(classifier_idx[0], len(x), dissimilarity_matrix))
     else:
+        print(x[classifier_idx[0] :])
         dissimilarity_matrix = get_cost_matrix(x[classifier_idx[0] :], args)
-        print("Cost matrix between layers {}-{} of model 0 is \n{}".format(classifier_idx[0] + 1, len(x), dissimilarity_matrix))
+        print("Cost matrix between layers {}-{} of model 0 is \n{}".format(classifier_idx[0], len(x), dissimilarity_matrix))
 
     print("Optimal map from model 1 to model 0 is {}".format(dissimilarity_matrix))
 
