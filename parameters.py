@@ -155,7 +155,7 @@ def get_parser():
         '--layer-measure',
         type=str,
         default='neuron',
-        choices=['neuron', 'activation', 'index'],
+        choices=['neuron', 'activation', 'index', 'weight'],
         help='type of layer measure',
     )
     parser.add_argument(
