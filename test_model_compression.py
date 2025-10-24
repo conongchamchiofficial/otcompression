@@ -157,7 +157,6 @@ def get_cost_matrix_conv_layer(x, model_name, args, dissimilarity_matrix):
     return dissimilarity_matrix
   
 
-
 def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_dataset=None):
     """
     Calculate dissimilarity index among layers in the large model
@@ -229,6 +228,17 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
 
     return dissimilarity_matrix
 
+
+def get_dissimilarity_matrix1(args, networks, num_layers, model_names):
+    ground_metric_object = GroundMetric(args)
+    for idx0, (layer_name0, layer_weight0) in networks[0].named_parameters():
+        for idx1, (layer_name1, layer_weight1) in networks[0].named_parameters():
+            layer_weight_data0 = layer_weight0.data
+            layer_weight_data1 = layer_weight1.data
+            M = ground_metric_object.process(layer_weight_data0.view(layer_weight_data0.shape[0], -1),
+                                             layer_weight_data1.view(layer_weight_data1.shape[0], -1))
+
+
 def compress_model(args, networks, accuracies, num_layers, model_names=None):
     """
     Compress deeper model to be the same size of smaller one
@@ -253,7 +263,7 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
         print("Model {} has accuracy of {} with {} layers and parameters".format(i, accuracies[i],num_layers[i]))
         print(networks)
 
-    dissimilarity_matrix = get_dissimilarity_matrix(args, networks, num_layers, model_names)
+    dissimilarity_matrix = get_dissimilarity_matrix1(args, networks, num_layers, model_names)
   
     return args, networks, accuracies, num_layers, model_names
 
