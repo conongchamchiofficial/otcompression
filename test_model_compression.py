@@ -233,8 +233,8 @@ def get_dissimilarity_matrix1(args, networks, num_layers, model_names):
     dissimilarity_matrix = np.full((num_layers[0], num_layers[0]), np.inf)
     
     ground_metric_object = GroundMetric(args)
-    for idx0, (layer_name0, layer_weight0) in networks[0].named_parameters():
-        for idx1, (layer_name1, layer_weight1) in networks[0].named_parameters():
+    for idx0, (layer_name0, layer_weight0) in enumerate(networks[0].named_parameters()):
+        for idx1, (layer_name1, layer_weight1) in enumerate(networks[0].named_parameters()):
             if idx1 <= idx0:
                 break
             layer_weight_data0 = layer_weight0.data
