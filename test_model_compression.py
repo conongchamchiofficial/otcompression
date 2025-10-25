@@ -285,7 +285,7 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
         print("Model {} has accuracy of {} with {} layers and parameters".format(i, accuracies[i],num_layers[i]))
         print(networks)
 
-    dissimilarity_matrix = get_dissimilarity_matrix(args, networks, num_layers, model_names)
+    dissimilarity_matrix = get_dissimilarity_matrix1(args, networks, num_layers, model_names)
   
     return args, networks, accuracies, num_layers, model_names
 
