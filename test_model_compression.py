@@ -290,7 +290,7 @@ def get_dissimilarity_matrix1(args, networks, num_layers, model_names):
     ground_metric_object = GroundMetric(args)
     for idx0, (layer_name0, layer_weight0) in enumerate(networks[0].named_parameters()):
         for idx1, (layer_name1, layer_weight1) in enumerate(networks[0].named_parameters()):
-            if idx1 <= idx0:
+            if idx1 < idx0:
                 continue
             
             mu_cardinality = layer_weight0.shape[0]
