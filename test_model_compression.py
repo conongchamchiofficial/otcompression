@@ -202,6 +202,7 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
     # initialize dissmilarity matrix
     dissimilarity_matrix = np.full((num_layers[0], num_layers[0]), np.inf)
     print("dissimilarity_matrix: ", dissimilarity_matrix)
+    
     # get layer representation of models (check x, y for layers within model)
     layer_representations = []
     if args.layer_measure == "index":
@@ -224,11 +225,6 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
         # act_end_time = time.perf_counter()
         # act_time = act_end_time - act_st_time
         assert args.layer_metric in ["cka", "cca", "wd"]
-
-    print("x: ", x)
-    print("x size: ", len(x))
-    print("y: ", y)
-    print("y size: ", len(y))
     
     # separate where is the FC layer start
     classifier_idx = [0, 0]
