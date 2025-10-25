@@ -83,6 +83,7 @@ class GroundMetric:
         # if self.params.dist_normalize:
         #     assert NotImplementedError
 
+        use_shared_pca = True
         # ---------- Step 1: Ensure 2D tensors ----------
         if x.dim() == 1:
             x = x.unsqueeze(1)
