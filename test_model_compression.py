@@ -199,9 +199,9 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
         assert args.layer_metric in ["cka", "cca", "wd"]
 
     print("x: ", x)
-    print("x shape: ", x.shape)
+    print("x size: ", x.size())
     print("y: ", y)
-    print("y shape: ", y.shape)
+    print("y size: ", y.size())
     
     # separate where is the FC layer start
     classifier_idx = [0, 0]
