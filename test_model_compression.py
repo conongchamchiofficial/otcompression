@@ -155,7 +155,34 @@ def get_cost_matrix_conv_layer(x, model_name, args, dissimilarity_matrix):
             print("Updating dissimilarity_matrix: ", dissimilarity_matrix)
 
     return dissimilarity_matrix
-  
+
+
+def get_histogram(args, idx, cardinality, layer_name, activations=None, return_numpy = True, float64=False):
+    if activations is None:
+        # returns a uniform measure
+        if not args.unbalanced:
+            print("returns a uniform measure of cardinality: ", cardinality)
+            return np.ones(cardinality)/cardinality
+        else:
+            return np.ones(cardinality)
+    else:
+        # return softmax over the activations raised to a temperature
+        # layer_name is like 'fc1.weight', while activations only contains 'fc1'
+        print(activations[idx].keys())
+        unnormalized_weights = activations[idx][layer_name.split('.')[0]]
+        print("For layer {},  shape of unnormalized weights is ".format(layer_name), unnormalized_weights.shape)
+        unnormalized_weights = unnormalized_weights.squeeze()
+        assert unnormalized_weights.shape[0] == cardinality
+
+        if return_numpy:
+            if float64:
+                return torch.softmax(unnormalized_weights / args.softmax_temperature, dim=0).data.cpu().numpy().astype(
+                    np.float64)
+            else:
+                return torch.softmax(unnormalized_weights / args.softmax_temperature, dim=0).data.cpu().numpy()
+        else:
+            return torch.softmax(unnormalized_weights / args.softmax_temperature, dim=0)
+
 
 def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_dataset=None):
     """
@@ -234,6 +261,29 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
     return dissimilarity_matrix
 
 
+def _get_neuron_importance_histogram(args, layer_weight, is_conv, eps=1e-9):
+    print('shape of layer_weight is ', layer_weight.shape)
+    if is_conv:
+        layer = layer_weight.contiguous().view(layer_weight.shape[0], -1).cpu().numpy()
+    else:
+        layer = layer_weight.cpu().numpy()
+    
+    if args.importance == 'l1':
+        importance_hist = np.linalg.norm(layer, ord=1, axis=-1).astype(
+                    np.float64) + eps
+    elif args.importance == 'l2':
+        importance_hist = np.linalg.norm(layer, ord=2, axis=-1).astype(
+                    np.float64) + eps
+    else:
+        raise NotImplementedError
+
+    if not args.unbalanced:
+        importance_hist = (importance_hist/importance_hist.sum())
+        print('sum of importance hist is ', importance_hist.sum())
+    # assert importance_hist.sum() == 1.0
+    return importance_hist
+
+
 def get_dissimilarity_matrix1(args, networks, num_layers, model_names):
     dissimilarity_matrix = np.full((num_layers[0], num_layers[0]), np.inf)
     
@@ -242,22 +292,39 @@ def get_dissimilarity_matrix1(args, networks, num_layers, model_names):
         for idx1, (layer_name1, layer_weight1) in enumerate(networks[0].named_parameters()):
             if idx1 <= idx0:
                 continue
-            layer_weight_data0 = layer_weight0.data
-            layer_weight_data1 = layer_weight1.data
-            print("layer_weight_data0: ", layer_weight_data0)
-            print("layer_weight_data0 shape: ", layer_weight_data0.shape)
-            print("layer_weight_data1: ", layer_weight_data1)
-            print("layer_weight_data1 shape: ", layer_weight_data1.shape)            
+            
+            mu_cardinality = layer_weight0.shape[0]
+            nu_cardinality = layer_weight1.shape[0]
+
+            if len(layer_weight0.shape) > 2:
+                is_conv = True
+                # For convolutional layers, it is (#out_channels, #in_channels, height, width)
+                layer_weight_data0 = layer_weight0.data.view(layer_weight0.shape[0], layer_weight0.shape[1], -1)
+                layer_weight_data1 = layer_weight1.data.view(layer_weight1.shape[0], layer_weight1.shape[1], -1)
+            else:
+                is_conv = False
+                layer_weight_data0 = layer_weight0.data
+                layer_weight_data0 = layer_weight1.data     
             
             M = ground_metric_object.process(layer_weight_data0.view(layer_weight_data0.shape[0], -1),
                                              layer_weight_data1.view(layer_weight_data1.shape[0], -1))
-            cpuM = M.data.cpu().numpy()
+
+            if args.importance is None or (idx0 == num_layers[0] - 1):
+                mu = get_histogram(args, 0, mu_cardinality, layer_name0)
+                nu = get_histogram(args, 0, nu_cardinality, layer_name0)
+            else:
+                # mu = _get_neuron_importance_histogram(args, aligned_wt, is_conv)
+                mu = _get_neuron_importance_histogram(args, layer_weight_data0, is_conv)
+                nu = _get_neuron_importance_histogram(args, layer_weight_data1, is_conv)
+                print(mu, nu)
+                assert args.proper_marginals
             
+            cpuM = M.data.cpu().numpy()
             cost = ot.emd2(mu, nu, cpuM)
             print(f"Cost between layer {idx0} and layer {idx1} is: ", cost)
-            
             dissimilarity_matrix[idx0, idx1] = cost
             print("Dissimilarity matrix among layers: ", dissimilarity_matrix)
+            
     return dissimilarity_matrix
 
 
