@@ -239,6 +239,10 @@ def get_dissimilarity_matrix1(args, networks, num_layers, model_names):
                 continue
             layer_weight_data0 = layer_weight0.data
             layer_weight_data1 = layer_weight1.data
+            print("layer_weight_data0: ", layer_weight_data0)
+            print("layer_weight_data0 shape: ", layer_weight_data0.shape)
+            print("layer_weight_data1: ", layer_weight_data1)
+            print("layer_weight_data1 shape: ", layer_weight_data1.shape)            
             
             M = ground_metric_object.process(layer_weight_data0.view(layer_weight_data0.shape[0], -1),
                                              layer_weight_data1.view(layer_weight_data1.shape[0], -1))
