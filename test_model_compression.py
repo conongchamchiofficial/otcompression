@@ -198,6 +198,11 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
         # act_time = act_end_time - act_st_time
         assert args.layer_metric in ["cka", "cca", "wd"]
 
+    print("x: ", x)
+    print("x shape: ", x.shape)
+    print("y: ", y)
+    print("y shape: ", y.shape)
+    
     # separate where is the FC layer start
     classifier_idx = [0, 0]
     for i in range(2):
@@ -280,7 +285,7 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
         print("Model {} has accuracy of {} with {} layers and parameters".format(i, accuracies[i],num_layers[i]))
         print(networks)
 
-    dissimilarity_matrix = get_dissimilarity_matrix1(args, networks, num_layers, model_names)
+    dissimilarity_matrix = get_dissimilarity_matrix(args, networks, num_layers, model_names)
   
     return args, networks, accuracies, num_layers, model_names
 
