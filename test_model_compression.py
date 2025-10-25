@@ -199,7 +199,7 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
         assert args.layer_metric in ["cka", "cca", "wd"]
 
     print("x: ", x)
-    print("x size: ", len((x))
+    print("x size: ", len(x))
     print("y: ", y)
     print("y size: ", len(y))
     
