@@ -60,28 +60,67 @@ class GroundMetric:
 
     def _cost_matrix_xy(self, x, y, p=2, squared = True):
         # TODO: Use this to guarantee reproducibility of previous results and then move onto better way
-        "Returns the matrix of $|x_i-y_j|^p$."
-        if x.dim() == 1: x = x.unsqueeze(1)
-        if y.dim() == 1: y = y.unsqueeze(1)
+        # "Returns the matrix of $|x_i-y_j|^p$."
+        # if x.dim() == 1: x = x.unsqueeze(1)
+        # if y.dim() == 1: y = y.unsqueeze(1)
         
+        # n, dx = x.shape
+        # m, dy = y.shape
+    
+        # # Project to common dimension
+        # d_common = min(dx, dy)
+        # if dx != dy:
+        #     x = x[:, :d_common]
+        #     y = y[:, :d_common]
+        
+        # x_col = x.unsqueeze(1)
+        # y_lin = y.unsqueeze(0)
+        # c = torch.sum((torch.abs(x_col - y_lin)) ** p, 2)
+        # if not squared:
+        #     print("dont leave off the squaring of the ground metric")
+        #     c = c ** (1/2)
+        # # print(c.size())
+        # if self.params.dist_normalize:
+        #     assert NotImplementedError
+
+        # ---------- Step 1: Ensure 2D tensors ----------
+        if x.dim() == 1:
+            x = x.unsqueeze(1)
+        if y.dim() == 1:
+            y = y.unsqueeze(1)
+    
         n, dx = x.shape
         m, dy = y.shape
     
-        # Project to common dimension
-        d_common = min(dx, dy)
-        if dx != dy:
-            x = x[:, :d_common]
-            y = y[:, :d_common]
-        
-        x_col = x.unsqueeze(1)
-        y_lin = y.unsqueeze(0)
-        c = torch.sum((torch.abs(x_col - y_lin)) ** p, 2)
+        # ---------- Step 2: Project to shared latent space ----------
+        d_common = min(dx, dy)  # latent dimension
+        X = x.detach().cpu().numpy()
+        Y = y.detach().cpu().numpy()
+    
+        if use_shared_pca:
+            # Fit one PCA on concatenated data (better alignment)
+            pca = PCA(n_components=d_common)
+            Z = np.vstack([X, Y])
+            Z_proj = pca.fit_transform(Z)
+            X_proj = Z_proj[:n]
+            Y_proj = Z_proj[n:]
+        else:
+            # Separate PCA projections for each
+            pca_x = PCA(n_components=d_common)
+            pca_y = PCA(n_components=d_common)
+            X_proj = pca_x.fit_transform(X)
+            Y_proj = pca_y.fit_transform(Y)
+    
+        x_proj = torch.tensor(X_proj, dtype=torch.float32, device=x.device)
+        y_proj = torch.tensor(Y_proj, dtype=torch.float32, device=y.device)
+    
+        # ---------- Step 3: Compute pairwise cost matrix ----------
+        x_col = x_proj.unsqueeze(1)  # (n,1,d_common)
+        y_lin = y_proj.unsqueeze(0)  # (1,m,d_common)
+    
+        c = torch.sum(torch.abs(x_col - y_lin) ** p, dim=2)  # (n,m)
         if not squared:
-            print("dont leave off the squaring of the ground metric")
-            c = c ** (1/2)
-        # print(c.size())
-        if self.params.dist_normalize:
-            assert NotImplementedError
+            c = c ** 0.5
         return c
 
 
