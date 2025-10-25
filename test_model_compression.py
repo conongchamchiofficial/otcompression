@@ -304,7 +304,7 @@ def get_dissimilarity_matrix1(args, networks, num_layers, model_names):
             else:
                 is_conv = False
                 layer_weight_data0 = layer_weight0.data
-                layer_weight_data0 = layer_weight1.data     
+                layer_weight_data1 = layer_weight1.data     
             
             M = ground_metric_object.process(layer_weight_data0.view(layer_weight_data0.shape[0], -1),
                                              layer_weight_data1.view(layer_weight_data1.shape[0], -1))
