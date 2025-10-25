@@ -61,12 +61,17 @@ class GroundMetric:
     def _cost_matrix_xy(self, x, y, p=2, squared = True):
         # TODO: Use this to guarantee reproducibility of previous results and then move onto better way
         "Returns the matrix of $|x_i-y_j|^p$."
-        if x.dim() == 1:
-            x = x.unsqueeze(1)
-        if y.dim() == 1:
-            y = y.unsqueeze(1)
-        if x.size(1) != y.size(1):
-            raise ValueError(f"Feature dimension mismatch: x has {x.size(1)}, y has {y.size(1)}")
+        if x.dim() == 1: x = x.unsqueeze(1)
+        if y.dim() == 1: y = y.unsqueeze(1)
+        
+        n, dx = x.shape
+        m, dy = y.shape
+    
+        # Project to common dimension
+        d_common = min(dx, dy)
+        if dx != dy:
+            x = x[:, :d_common]
+            y = y[:, :d_common]
         
         x_col = x.unsqueeze(1)
         y_lin = y.unsqueeze(0)
