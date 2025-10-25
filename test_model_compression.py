@@ -236,7 +236,7 @@ def get_dissimilarity_matrix1(args, networks, num_layers, model_names):
     for idx0, (layer_name0, layer_weight0) in enumerate(networks[0].named_parameters()):
         for idx1, (layer_name1, layer_weight1) in enumerate(networks[0].named_parameters()):
             if idx1 <= idx0:
-                break
+                continue
             layer_weight_data0 = layer_weight0.data
             layer_weight_data1 = layer_weight1.data
             
