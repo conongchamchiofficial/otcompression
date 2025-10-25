@@ -230,13 +230,26 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
 
 
 def get_dissimilarity_matrix1(args, networks, num_layers, model_names):
+    dissimilarity_matrix = np.full((num_layers[0], num_layers[0]), np.inf)
+    
     ground_metric_object = GroundMetric(args)
     for idx0, (layer_name0, layer_weight0) in networks[0].named_parameters():
         for idx1, (layer_name1, layer_weight1) in networks[0].named_parameters():
+            if idx1 <= idx0:
+                break
             layer_weight_data0 = layer_weight0.data
             layer_weight_data1 = layer_weight1.data
+            
             M = ground_metric_object.process(layer_weight_data0.view(layer_weight_data0.shape[0], -1),
                                              layer_weight_data1.view(layer_weight_data1.shape[0], -1))
+            cpuM = M.data.cpu().numpy()
+            
+            cost = ot.emd2(mu, nu, cpuM)
+            print(f"Cost between layer {idx0} and layer {idx1} is: ", cost)
+            
+            dissimilarity_matrix[idx0, idx1] = cost
+            print("Dissimilarity matrix among layers: ", dissimilarity_matrix)
+    return dissimilarity_matrix
 
 
 def compress_model(args, networks, accuracies, num_layers, model_names=None):
