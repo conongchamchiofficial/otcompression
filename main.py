@@ -144,8 +144,8 @@ if __name__ == '__main__':
         num_layers = num_layers[::-1]
         model_names = model_names[::-1]
     
-    for idx in len(models):
-        for name, param in models[idx].named_parameters():
+    for idx, model in enumerate(models):
+        for name, param in model.named_parameters():
             print(f'Model {idx} layer {name} has #params {param.numel()} and parameters {param.shape}')
 
     import time
