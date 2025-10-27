@@ -144,9 +144,9 @@ if __name__ == '__main__':
         num_layers = num_layers[::-1]
         model_names = model_names[::-1]
     
-    for name, param in models[0].named_parameters():
-        print(f'layer {name} has #params {param.numel()} and model parameters {param.shape}')
-        print(models[idx])
+    for idx in len(models):
+        for name, param in models[idx].named_parameters():
+            print(f'Model {idx} layer {name} has #params {param.numel()} and parameters {param.shape}')
 
     import time
     # second_config is not needed here as well, since it's just used for the dataloader!
