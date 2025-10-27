@@ -283,6 +283,8 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
     else:
         raise ValueError
 
+    network_params = list(network0.named_parameters())
+    
     for grp in range(I):
         for idx, layer  in enumerate(grp):
             if idx == 0:
