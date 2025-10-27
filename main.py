@@ -132,8 +132,21 @@ if __name__ == '__main__':
         models = [model, model]
         accuracies = [acc, acc]
 
+    for idx, model in enumerate(models):
+        num_layer = utils.get_number_of_layers(models[idx])
+        num_layers.append(num_layer)
+
+    # change position of deeper model to model 0
+    if num_layers[0] < num_layers[1]:
+        print("Shuffle two models so that model 0 has more layers than model 1")
+        networks = networks[::-1]
+        accuracies = accuracies[::-1]
+        num_layers = num_layers[::-1]
+        model_names = model_names[::-1]
+    
     for name, param in models[0].named_parameters():
-        print(f'layer {name} has #params ', param.numel())
+        print(f'layer {name} has #params {param.numel()} and model parameters {param.shape}')
+        print(models[idx])
 
     import time
     # second_config is not needed here as well, since it's just used for the dataloader!
@@ -147,12 +160,6 @@ if __name__ == '__main__':
     for idx, model in enumerate(models):
         setattr(args, f'params_model_{idx}', utils.get_model_size(model))
 
-    for idx, model in enumerate(models):
-        num_layer = utils.get_number_of_layers(models[idx])
-        num_layers.append(num_layer)
-        print("Model {} has {} layers".format(idx, num_layers[idx]))
-        print(models[idx])
-        print(config_list[idx])
     # if args.ensemble_iter == 1:
     #
     # else:
@@ -163,7 +170,6 @@ if __name__ == '__main__':
     # set seed for numpy based calculations
     NUMPY_SEED = 100
     np.random.seed(NUMPY_SEED)
-
 
     # run model compression
     print("------- Model Compression -------")
