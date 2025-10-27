@@ -139,7 +139,7 @@ if __name__ == '__main__':
     # change position of deeper model to model 0
     if num_layers[0] < num_layers[1]:
         print("Shuffle two models so that model 0 has more layers than model 1")
-        networks = networks[::-1]
+        models = models[::-1]
         accuracies = accuracies[::-1]
         num_layers = num_layers[::-1]
         model_names = model_names[::-1]
