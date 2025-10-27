@@ -255,6 +255,31 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
     return dissimilarity_matrix, x, y
 
 
+def approximate_relu(act_mat, num_columns, args, method):
+    """
+    Approximate ReLU activation function by a diagonal matrix
+
+    :param act_mat: the pre-activation matrix, i.e. before applying ReLU
+    :param num_columns: the number of nodes in the previous layer
+    :param args: config parameters
+    :return: a matrix in which each row has the same value
+    """
+    relu_approx_method = args.relu_approx_method
+    if relu_approx_method == "sum":
+        act_vec = act_mat.sum(axis=0) >= 0
+    elif relu_approx_method == "majority":
+        act_vec = (act_mat > 0).mean(axis=0) >= 0.5
+    elif relu_approx_method == "avg":
+        act_vec = ((act_mat > 0) * 1.0).mean(axis=0)
+    else:
+        raise NotImplementedError
+
+    if isinstance(act_vec, torch.Tensor):
+        return act_vec.unsqueeze(0).repeat(num_columns, 1).T
+    else:
+        return np.tile(act_vec, (num_columns, 1)).T
+
+
 def merge_layers(args, network0, num_layer0, acts, I, method):
     """
     Merge consecutive layers in the larger model.
@@ -281,12 +306,20 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
     
     for grp in range(I):
         for idx, layer  in enumerate(grp):
-            if idx == 0:
-                continue
-            elif idx < range(grp) - 1:
+             if idx < range(grp) - 1:
                 print(f"Merge layer {layer} with {grp[0]}")
+                print("Approximate ReLU at hidden layer {} with activation of shape {}".format(idx + 1, acts[idx].shape)) # check why idx + 1
+                act_vec = approximate_relu(acts[idx], layer_weight.shape[1], args, method=method)
+                if not isinstance(act_vec, torch.Tensor):
+                    act_vec = torch.from_numpy(act_vec).cuda(args.gpu_id)
+                layer_weight = layer_weight * act_vec
+                pre_weight = layer_weight @ pre_weight               
             else:
                 print(f"Merge last layer {layer} with {grp[0]}")
+                pre_weight = layer_weight @ pre_weight
+                setattr(args, "num_hidden_nodes" + str(l1 + 1), layer_weight.shape[0]) # check wth is this
+                new_weight.append(pre_weight)
+                pre_weight = torch.eye(layer_weight.shape[0]).cuda(args.gpu_id)
                 
     return new_weights, args
 
