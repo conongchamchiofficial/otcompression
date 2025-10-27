@@ -44,8 +44,6 @@ def get_weight_matrices(network):
 
     for _, layer_weight in network.named_parameters():
         model_weights.append(layer_weight)
-        print("layer_weight: ", layer_weight)
-        print("layer_weight size: ", layer_weight.shape)
 
     return model_weights
 
@@ -73,8 +71,6 @@ def get_activation_matrices(args, networks, personal_dataset=None, config=None, 
                 reorder_dim.extend([0, 1])
                 layer_act = layer_act.permute(*reorder_dim).contiguous()
             layer_act = layer_act.view(layer_act.size(0), -1)
-            print(f"layer_act: ", layer_act)
-            print("layer_act size", layer_act.shape)
             model_act.append(layer_act)
 
         # exclude the activation of output layer
@@ -126,7 +122,6 @@ def get_cost_matrix(x, args):
     cost_matrix = np.full((m, m), np.inf)
     for i in range(m):
         for j in range(i, m):
-            print(f"Shape weights of layer {i}: ", x[i].shape)
             cost_matrix[i][j] = get_cost(x[i], x[j], args, layer_metric)
 
     return cost_matrix
@@ -237,7 +232,6 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
             if len(layer_weight.shape) == 2:
                 break
     classifier_idx[i] = idx
-    print(f"FC layers of model {i} start from {idx}")
     
     # get dissimilarity matrix among layers of model 0
     if classifier_idx[0] > 0:
@@ -250,11 +244,11 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
 
         if classifier_idx[0] < len(x):
             dissimilarity_matrix = get_cost_matrix(x[classifier_idx[0] :], args)
-            print("Cost matrix between layers {}-{} of model 0 is \n{}".format(classifier_idx[0], len(x), dissimilarity_matrix))
+            #print("Cost matrix between layers {}-{} of model 0 is \n{}".format(classifier_idx[0], len(x), dissimilarity_matrix))
     else:
         print(x[classifier_idx[0] :])
         dissimilarity_matrix = get_cost_matrix(x[classifier_idx[0] :], args)
-        print("Cost matrix between layers {}-{} of model 0 is \n{}".format(classifier_idx[0], len(x), dissimilarity_matrix))
+        #print("Cost matrix between layers {}-{} of model 0 is \n{}".format(classifier_idx[0], len(x), dissimilarity_matrix))
 
     print("Optimal map from model 1 to model 0 is {}".format(dissimilarity_matrix))
 
