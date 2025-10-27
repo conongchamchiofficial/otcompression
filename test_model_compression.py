@@ -44,6 +44,8 @@ def get_weight_matrices(network):
 
     for _, layer_weight in network.named_parameters():
         model_weights.append(layer_weight)
+        print("layer_weight: ", layer_weight)
+        print("layer_weight size: ", layer_weight.shape)
 
     return model_weights
 
@@ -71,7 +73,7 @@ def get_activation_matrices(args, networks, personal_dataset=None, config=None, 
                 reorder_dim.extend([0, 1])
                 layer_act = layer_act.permute(*reorder_dim).contiguous()
             layer_act = layer_act.view(layer_act.size(0), -1)
-            print("layer_act: ", layer_act)
+            print(f"layer_act of {}: ", layer_act)
             print("layer_act size", layer_act.shape)
             model_act.append(layer_act)
 
@@ -257,29 +259,6 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
     print("Optimal map from model 1 to model 0 is {}".format(dissimilarity_matrix))
 
     return dissimilarity_matrix
-
-
-def _get_neuron_importance_histogram(args, layer_weight, is_conv, eps=1e-9):
-    print('shape of layer_weight is ', layer_weight.shape)
-    if is_conv:
-        layer = layer_weight.contiguous().view(layer_weight.shape[0], -1).cpu().numpy()
-    else:
-        layer = layer_weight.cpu().numpy()
-    
-    if args.importance == 'l1':
-        importance_hist = np.linalg.norm(layer, ord=1, axis=-1).astype(
-                    np.float64) + eps
-    elif args.importance == 'l2':
-        importance_hist = np.linalg.norm(layer, ord=2, axis=-1).astype(
-                    np.float64) + eps
-    else:
-        raise NotImplementedError
-
-    if not args.unbalanced:
-        importance_hist = (importance_hist/importance_hist.sum())
-        print('sum of importance hist is ', importance_hist.sum())
-    # assert importance_hist.sum() == 1.0
-    return importance_hist
 
 
 def compress_model(args, networks, accuracies, num_layers, model_names=None):
