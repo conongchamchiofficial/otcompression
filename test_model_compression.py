@@ -71,6 +71,8 @@ def get_activation_matrices(args, networks, personal_dataset=None, config=None, 
                 reorder_dim.extend([0, 1])
                 layer_act = layer_act.permute(*reorder_dim).contiguous()
             layer_act = layer_act.view(layer_act.size(0), -1)
+            print("layer_act: ", layer_act)
+            print("layer_act size", layer_act.shape)
             model_act.append(layer_act)
 
         # exclude the activation of output layer
@@ -280,50 +282,6 @@ def _get_neuron_importance_histogram(args, layer_weight, is_conv, eps=1e-9):
     return importance_hist
 
 
-def get_dissimilarity_matrix1(args, networks, num_layers, model_names):
-    dissimilarity_matrix = np.full((num_layers[0], num_layers[0]), np.inf)
-    
-    ground_metric_object = GroundMetric(args)
-    for idx0, (layer_name0, layer_weight0) in enumerate(networks[0].named_parameters()):
-        for idx1, (layer_name1, layer_weight1) in enumerate(networks[0].named_parameters()):
-            if idx1 < idx0:
-                continue
-            
-            mu_cardinality = layer_weight0.shape[0]
-            nu_cardinality = layer_weight1.shape[0]
-
-            if len(layer_weight0.shape) > 2:
-                is_conv = True
-                # For convolutional layers, it is (#out_channels, #in_channels, height, width)
-                layer_weight_data0 = layer_weight0.data.view(layer_weight0.shape[0], layer_weight0.shape[1], -1)
-                layer_weight_data1 = layer_weight1.data.view(layer_weight1.shape[0], layer_weight1.shape[1], -1)
-            else:
-                is_conv = False
-                layer_weight_data0 = layer_weight0.data
-                layer_weight_data1 = layer_weight1.data     
-            
-            M = ground_metric_object.process(layer_weight_data0.view(layer_weight_data0.shape[0], -1),
-                                             layer_weight_data1.view(layer_weight_data1.shape[0], -1))
-
-            if args.importance is None or (idx0 == num_layers[0] - 1):
-                mu = get_histogram(args, 0, mu_cardinality, layer_name0)
-                nu = get_histogram(args, 0, nu_cardinality, layer_name0)
-            else:
-                # mu = _get_neuron_importance_histogram(args, aligned_wt, is_conv)
-                mu = _get_neuron_importance_histogram(args, layer_weight_data0, is_conv)
-                nu = _get_neuron_importance_histogram(args, layer_weight_data1, is_conv)
-                print(mu, nu)
-                assert args.proper_marginals
-            
-            cpuM = M.data.cpu().numpy()
-            cost = ot.emd2(mu, nu, cpuM)
-            print(f"Cost between layer {idx0} and layer {idx1} is: ", cost)
-            dissimilarity_matrix[idx0, idx1] = cost
-            print("Dissimilarity matrix among layers: ", dissimilarity_matrix)
-            
-    return dissimilarity_matrix
-
-
 def compress_model(args, networks, accuracies, num_layers, model_names=None):
     """
     Compress deeper model to be the same size of smaller one
@@ -348,7 +306,7 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
         print("Model {} has accuracy of {} with {} layers and parameters".format(i, accuracies[i],num_layers[i]))
         print(networks)
 
-    dissimilarity_matrix = get_dissimilarity_matrix1(args, networks, num_layers, model_names)
+    dissimilarity_matrix = get_dissimilarity_matrix(args, networks, num_layers, model_names)
   
     return args, networks, accuracies, num_layers, model_names
 
