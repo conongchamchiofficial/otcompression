@@ -258,12 +258,46 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
 
     print("Optimal map from model 1 to model 0 is {}".format(dissimilarity_matrix))
 
-    return dissimilarity_matrix
+    return dissimilarity_matrix, x, y
+
+
+def merge_layers(args, network0, num_layer0, acts, I, method):
+    """
+    Merge consecutive layers in the larger model.
+
+    :param args: config parameters
+    :param network0: the large model
+    :param num_layer0: the number of layers of the large model
+    :param acts: list of activation matrices for hidden layers
+    :param I: groups of layers merged
+    :param method: method to approximate the sign of activation ["sum", "majority"], default = "sum"
+    
+    :return: list of weight matrix of the new model and the updated args
+    """
+    new_weight = []
+    
+    if args.dataset == "mnist":
+        input_dim = 784
+    elif args.dataset == "cifar10":
+        input_dim = 3072
+    else:
+        raise ValueError
+
+    for grp in range(I):
+        for idx, layer  in enumerate(grp):
+            if idx == 0:
+                continue
+            elif idx < range(grp) - 1:
+                print(f"Merge layer {layer} with {grp[0]}")
+            else:
+                print(f"Merge last layer {layer} with {grp[0]}")
+                
+    return new_weights, args
 
 
 def compress_model(args, networks, accuracies, num_layers, model_names=None):
     """
-    Compress deeper model to be the same size of smaller one
+    Compress deeper model to be the same size of swallower one
     
     :param args: config parameters
     :param networks: list of models
@@ -272,21 +306,14 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     :param model_names: list of model_names
     :return: updated large model, accuracy and config parameters
     """
+    print("------ Construct dissimilarity matrix among layers in model 0 ------")
+    dissimilarity_matrix, config_param0, config_param1 = get_dissimilarity_matrix(args, networks, num_layers, model_names)
+
+    print("------ Choose top-k layers to merge ------")
+
+    print("------ Model compression by merging layers via OT ------")
+    new_weights, args = merge_layers(args, networks[0], networks[1], num_layers[0], num_layers[1], config_param0, A, method=args.relu_approx_method)
     
-    if num_layers[0] < num_layers[1]:
-        print("Shuffle two models so that model 0 has more layers than model 1")
-        networks = networks[::-1]
-        accuracies = accuracies[::-1]
-        num_layers = num_layers[::-1]
-        model_names = model_names[::-1]
-
-    print("------ Before compression ------")
-    for i, network in enumerate(networks):
-        print("Model {} has accuracy of {} with {} layers and parameters".format(i, accuracies[i],num_layers[i]))
-        print(networks)
-
-    dissimilarity_matrix = get_dissimilarity_matrix(args, networks, num_layers, model_names)
-  
     return args, networks, accuracies, num_layers, model_names
 
 
