@@ -304,9 +304,9 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
 
     network_params = list(network0.named_parameters())
     
-    for grp in range(I):
+    for grp in I:
         for idx, layer  in enumerate(grp):
-            if idx < range(grp) - 1:
+            if idx < len(grp) - 1:
                 print(f"Merge layer {layer} with {grp[-1]}")
                 print("Approximate ReLU at hidden layer {} with activation of shape {}".format(idx + 1, acts[idx].shape)) # check why idx + 1
                 act_vec = approximate_relu(acts[idx], layer_weight.shape[1], args, method=relu_approx_method)
