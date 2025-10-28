@@ -262,13 +262,14 @@ def approximate_relu(act_mat, num_columns, args, method):
     :param act_mat: the pre-activation matrix, i.e. before applying ReLU
     :param num_columns: the number of nodes in the previous layer
     :param args: config parameters
+    :param method: method to approximate the sign of activation ["sum", "majority", "avg"], default = "sum"
     :return: a matrix in which each row has the same value
     """
-    if relu_approx_method == "sum":
+    if method == "sum":
         act_vec = act_mat.sum(axis=0) >= 0
-    elif relu_approx_method == "majority":
+    elif method == "majority":
         act_vec = (act_mat > 0).mean(axis=0) >= 0.5
-    elif relu_approx_method == "avg":
+    elif method == "avg":
         act_vec = ((act_mat > 0) * 1.0).mean(axis=0)
     else:
         raise NotImplementedError
@@ -310,7 +311,7 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
             if idx < len(grp) - 1:
                 print(f"Merge layer {layer} with {grp[-1]}")
                 print("Approximate ReLU at hidden layer {} with activation of shape {}".format(idx + 1, acts[idx].shape)) # check why idx + 1
-                act_vec = approximate_relu(acts[idx], layer_weight.shape[1], args, method=relu_approx_method)
+                act_vec = approximate_relu(acts[idx], layer_weight.shape[1], args, method)
                 if not isinstance(act_vec, torch.Tensor):
                     act_vec = torch.from_numpy(act_vec).cuda(args.gpu_id)
                 layer_weight = layer_weight * act_vec
