@@ -313,7 +313,7 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
                 print("Approximate ReLU at hidden layer {} with activation of shape {}".format(idx + 1, acts[idx].shape)) # check why idx + 1
                 act_vec = approximate_relu(acts[idx], layer_weight.shape[1], args, method)
                 print("act_vec.shape: ", act_vec.shape)
-                print("layer_weight.shape: " layer_weight.shape)
+                print("layer_weight.shape: ", layer_weight.shape)
                 assert act_vec.shape == layer_weight.shape
                 if not isinstance(act_vec, torch.Tensor):
                     act_vec = torch.from_numpy(act_vec).cuda(args.gpu_id)
