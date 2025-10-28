@@ -313,8 +313,8 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
                 if not isinstance(act_vec, torch.Tensor):
                     act_vec = torch.from_numpy(act_vec).cuda(args.gpu_id)
                 layer_weight = layer_weight * act_vec
-                pre_weight = layer_weight @ pre_weight               
-            else:
+                pre_weight = layer_weight @ pre_weight
+             else:
                 print(f"Merge last layer {layer} with {grp[0]}")
                 pre_weight = layer_weight @ pre_weight
                 setattr(args, "num_hidden_nodes" + str(l1 + 1), layer_weight.shape[0]) # check wth is this
