@@ -170,6 +170,13 @@ def get_parser():
         default=[],
         help='list of model names, e.g. "mlpnet; mlpnet"; "vgg11_nobias; vgg13_nobias"',
     )
+    parser.add_argument(
+        "--relu-approx-method",
+        type=str,
+        default="sum",
+        choices=["sum", "majority", "avg"],
+        help="method to approximate ReLU",
+    )
     parser.add_argument('--ground-metric', type=str, default='euclidean', choices=['euclidean', 'cosine'],
                         help='ground metric for OT calculations, only works in free support v2 and soon with Ground Metric class in all! .')
     parser.add_argument('--ground-metric-normalize', type=str, default='log', choices=['log', 'max', 'none', 'median', 'mean'],
