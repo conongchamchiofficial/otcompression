@@ -306,7 +306,7 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
     
     for grp in range(I):
         for idx, layer  in enumerate(grp):
-             if idx < range(grp) - 1:
+            if idx < range(grp) - 1:
                 print(f"Merge layer {layer} with {grp[-1]}")
                 print("Approximate ReLU at hidden layer {} with activation of shape {}".format(idx + 1, acts[idx].shape)) # check why idx + 1
                 act_vec = approximate_relu(acts[idx], layer_weight.shape[1], args, method=relu_approx_method)
@@ -314,13 +314,13 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
                     act_vec = torch.from_numpy(act_vec).cuda(args.gpu_id)
                 layer_weight = layer_weight * act_vec
                 pre_weight = layer_weight @ pre_weight
-             else:
+            else:
                 print(f"Merge last layer {layer} with {grp[0]}")
                 pre_weight = layer_weight @ pre_weight
                 setattr(args, "num_hidden_nodes" + str(l1 + 1), layer_weight.shape[0]) # check wth is this
                 new_weight.append(pre_weight)
                 pre_weight = torch.eye(layer_weight.shape[0]).cuda(args.gpu_id)
-            setattr(args, "num_hidden_layers", n)
+                setattr(args, "num_hidden_layers", n)
     print(new_weights)
     return new_weights, args
 
