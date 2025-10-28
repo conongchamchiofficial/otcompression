@@ -293,6 +293,7 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
     :return: list of weight matrix of the new model and the updated args
     """
     new_weight = []
+    n = 2
     
     if args.dataset == "mnist":
         input_dim = 784
@@ -306,7 +307,7 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
     for grp in range(I):
         for idx, layer  in enumerate(grp):
              if idx < range(grp) - 1:
-                print(f"Merge layer {layer} with {grp[0]}")
+                print(f"Merge layer {layer} with {grp[-1]}")
                 print("Approximate ReLU at hidden layer {} with activation of shape {}".format(idx + 1, acts[idx].shape)) # check why idx + 1
                 act_vec = approximate_relu(acts[idx], layer_weight.shape[1], args, method=relu_approx_method)
                 if not isinstance(act_vec, torch.Tensor):
@@ -339,7 +340,7 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     dissimilarity_matrix, config_param0, config_param1 = get_dissimilarity_matrix(args, networks, num_layers, model_names)
 
     print("------ Choose top-k layers to merge ------")
-
+    I = [[0, 1], [2, 3]]
     print("------ Model compression by merging layers via OT ------")
     new_weights, args = merge_layers(args, networks[0], num_layers[0], config_param0, I, method=args.relu_approx_method)
     
