@@ -264,7 +264,6 @@ def approximate_relu(act_mat, num_columns, args, method):
     :param args: config parameters
     :return: a matrix in which each row has the same value
     """
-    relu_approx_method = args.relu_approx_method
     if relu_approx_method == "sum":
         act_vec = act_mat.sum(axis=0) >= 0
     elif relu_approx_method == "majority":
@@ -309,7 +308,7 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
              if idx < range(grp) - 1:
                 print(f"Merge layer {layer} with {grp[0]}")
                 print("Approximate ReLU at hidden layer {} with activation of shape {}".format(idx + 1, acts[idx].shape)) # check why idx + 1
-                act_vec = approximate_relu(acts[idx], layer_weight.shape[1], args, method=method)
+                act_vec = approximate_relu(acts[idx], layer_weight.shape[1], args, method=relu_approx_method)
                 if not isinstance(act_vec, torch.Tensor):
                     act_vec = torch.from_numpy(act_vec).cuda(args.gpu_id)
                 layer_weight = layer_weight * act_vec
@@ -320,7 +319,8 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
                 setattr(args, "num_hidden_nodes" + str(l1 + 1), layer_weight.shape[0]) # check wth is this
                 new_weight.append(pre_weight)
                 pre_weight = torch.eye(layer_weight.shape[0]).cuda(args.gpu_id)
-                
+            setattr(args, "num_hidden_layers", n)
+    print(new_weights)
     return new_weights, args
 
 
@@ -341,7 +341,7 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     print("------ Choose top-k layers to merge ------")
 
     print("------ Model compression by merging layers via OT ------")
-    new_weights, args = merge_layers(args, networks[0], networks[1], num_layers[0], num_layers[1], config_param0, A, method=args.relu_approx_method)
+    new_weights, args = merge_layers(args, networks[0], num_layers[0], config_param0, I, method=args.relu_approx_method)
     
     return args, networks, accuracies, num_layers, model_names
 
