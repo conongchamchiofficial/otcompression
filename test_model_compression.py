@@ -64,8 +64,10 @@ def get_activation_matrices(args, networks, personal_dataset=None, config=None, 
 
     for _, model_dict in activations.items():
         model_act = []
+        print("model_dict: ", model_dict)
 
         for _, layer_act in model_dict.items():
+            print("layer_act: ", layer_act)
             if is_wd:
                 reorder_dim = [l for l in range(2, len(layer_act.shape))]
                 reorder_dim.extend([0, 1])
