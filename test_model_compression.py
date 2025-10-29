@@ -310,7 +310,7 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
             if idx < len(grp) - 1:
                 print(f"Merge layer {layer} with {grp[-1]}")
                 print("Approximate ReLU at hidden layer {} with activation of shape {}".format(idx + 1, acts[idx].shape))
-                act_vec = approximate_relu(acts[layer], layer_weight.shape[1], args, method)
+                act_vec = approximate_relu(acts[layer], layer_weight.shape[0], args, method)
                 print("act_vec.shape: ", act_vec.shape)
                 print("layer_weight.shape: ", layer_weight.shape)
                 assert act_vec.shape == layer_weight.shape
