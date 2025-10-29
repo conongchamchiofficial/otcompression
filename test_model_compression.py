@@ -31,8 +31,6 @@ def get_number_of_neurons(network):
 
     return np.array(n_neurons)[:-1]
 
-    return np.array(n_neurons)[:-1]
-
 
 def get_weight_matrices(network):
     """
@@ -45,7 +43,7 @@ def get_weight_matrices(network):
     for _, layer_weight in network.named_parameters():
         model_weights.append(layer_weight)
 
-    return model_weights
+    return  np.array(model_weights)[:-1]
 
 
 def get_activation_matrices(args, networks, personal_dataset=None, config=None, is_wd=False):
@@ -202,15 +200,15 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
     # align_time = 0
     # align_st_time = time.perf_counter()
 
-    # initialize dissmilarity matrix
-    dissimilarity_matrix = np.full((num_layers[0], num_layers[0]), np.inf)
+    # initialize dissmilarity matrix among hidden layers
+    dissimilarity_matrix = np.full((num_layers[0] - 1, num_layers[0] - 1), np.inf)
     print("dissimilarity_matrix: ", dissimilarity_matrix)
     
     # get layer representation of models (check x, y for layers within model)
     layer_representations = []
     if args.layer_measure == "index":
-        x = np.arange(0, num_layers[0])
-        y = np.arange(0, num_layers[1])
+        x = np.arange(0, num_layers[0] - 1)
+        y = np.arange(0, num_layers[1] - 1)
         # layer_representations.append(layer_representation)
         assert args.layer_metric == "euclidean"
     elif args.layer_measure == "neuron":
@@ -298,7 +296,7 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
     :return: list of weight matrix of the new model and the updated args
     """
     new_weight = []
-    n = 2
+    n = 3
     
     if args.dataset == "mnist":
         input_dim = 784
@@ -311,10 +309,10 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
     
     for grp in I:
         for idx, layer in enumerate(grp):
-            (_, layer_weight) = network_params[idx]
+            (_, layer_weight) = network_params[layer]
             if idx < len(grp) - 1:
                 print(f"Merge layer {layer} with {grp[-1]}")
-                print("Approximate ReLU at hidden layer {} with activation of shape {}".format(idx + 1, acts[idx].shape)) # check why idx + 1
+                print("Approximate ReLU at hidden layer {} with activation of shape {}".format(idx + 1, acts[idx].shape))
                 act_vec = approximate_relu(acts[idx], layer_weight.shape[1], args, method)
                 print("act_vec.shape: ", act_vec.shape)
                 print("layer_weight.shape: ", layer_weight.shape)
@@ -349,7 +347,7 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     dissimilarity_matrix, config_param0, config_param1 = get_dissimilarity_matrix(args, networks, num_layers, model_names)
 
     print("------ Choose top-k layers to merge ------")
-    I = [[0, 1], [2, 3]]
+    I = [[1, 2], [2, 3]]
     print("------ Model compression by merging layers via OT ------")
     new_weights, args = merge_layers(args, networks[0], num_layers[0], config_param0, I, method=args.relu_approx_method)
     
