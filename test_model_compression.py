@@ -297,7 +297,7 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
     network_params = list(network0.named_parameters())
     
     if args.dataset == "mnist":
-        input_dim = 400
+        input_dim = 784
     elif args.dataset == "cifar10":
         input_dim = 3072
     else:
@@ -313,6 +313,8 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
                 act_vec = approximate_relu(acts[layer], layer_weight.shape[0], args, method)
                 print("act_vec.shape: ", act_vec.shape)
                 print("layer_weight.shape: ", layer_weight.shape)
+                print("layer_weight.shape[0]: ", layer_weight.shape[0])
+                print("pre_weight: ", pre_weight)
                 assert act_vec.shape == layer_weight.shape
                 if not isinstance(act_vec, torch.Tensor):
                     act_vec = torch.from_numpy(act_vec).cuda(args.gpu_id)
@@ -344,7 +346,7 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     dissimilarity_matrix, config_param0, config_param1 = get_dissimilarity_matrix(args, networks, num_layers, model_names)
 
     print("------ Choose top-k layers to merge ------")
-    I = [[1, 2], [2, 3]]
+    I = [[0, 1], [2, 3]]
     print("------ Model compression by merging layers via OT ------")
     new_weights, args = merge_layers(args, networks[0], num_layers[0], config_param0, I, method=args.relu_approx_method)
     
