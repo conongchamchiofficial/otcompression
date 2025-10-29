@@ -265,7 +265,7 @@ def approximate_relu(act_mat, num_columns, args, method):
     :return: a matrix in which each row has the same value
     """
     if method == "sum":
-        act_vec = act_mat.sum(axis=1) >= 0
+        act_vec = act_mat.sum(axis=0) >= 0
     elif method == "majority":
         act_vec = (act_mat > 0).mean(axis=0) >= 0.5
     elif method == "avg":
@@ -297,7 +297,7 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
     network_params = list(network0.named_parameters())
     
     if args.dataset == "mnist":
-        input_dim = 784
+        input_dim = 400
     elif args.dataset == "cifar10":
         input_dim = 3072
     else:
@@ -344,7 +344,7 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     dissimilarity_matrix, config_param0, config_param1 = get_dissimilarity_matrix(args, networks, num_layers, model_names)
 
     print("------ Choose top-k layers to merge ------")
-    I = [[0, 1], [2, 3]]
+    I = [[1, 2], [2, 3]]
     print("------ Model compression by merging layers via OT ------")
     new_weights, args = merge_layers(args, networks[0], num_layers[0], config_param0, I, method=args.relu_approx_method)
     
