@@ -62,10 +62,8 @@ def get_activation_matrices(args, networks, personal_dataset=None, config=None, 
 
     for _, model_dict in activations.items():
         model_act = []
-        print("model_dict: ", model_dict)
 
         for _, layer_act in model_dict.items():
-            print("layer_act: ", layer_act)
             if is_wd:
                 reorder_dim = [l for l in range(2, len(layer_act.shape))]
                 reorder_dim.extend([0, 1])
@@ -73,7 +71,6 @@ def get_activation_matrices(args, networks, personal_dataset=None, config=None, 
             layer_act = layer_act.view(layer_act.size(0), -1)
             print("new layer_act: ", layer_act)
             model_act.append(layer_act)
-        print("model_act: ",model_act)
 
         # exclude the activation of output layer
         list_act.append(model_act[:-1])
@@ -315,7 +312,7 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
                 print("Approximate ReLU at hidden layer {} with activation of shape {}".format(idx + 1, acts[idx].shape))
                 act_vec = approximate_relu(acts[idx], layer_weight.shape[1], args, method)
                 print("act_vec.shape: ", act_vec.shape)
-                print("layer_weight.shape: ", layer_weight.shape[1])
+                print("layer_weight.shape: ", layer_weight.shape)
                 assert act_vec.shape == layer_weight.shape
                 if not isinstance(act_vec, torch.Tensor):
                     act_vec = torch.from_numpy(act_vec).cuda(args.gpu_id)
