@@ -294,6 +294,8 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
     """
     new_weight = []
     n = num_layer0 - 1
+    network_params = list(network0.named_parameters())
+    pre_weight = torch.eye(input_dim).cuda(args.gpu_id)
     
     if args.dataset == "mnist":
         input_dim = 784
@@ -301,8 +303,6 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
         input_dim = 3072
     else:
         raise ValueError
-
-    network_params = list(network0.named_parameters())
     
     for grp in I:
         for idx, layer in enumerate(grp):
