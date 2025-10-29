@@ -310,7 +310,7 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
             if idx < len(grp) - 1:
                 print(f"Merge layer {layer} with {grp[-1]}")
                 print("Approximate ReLU at hidden layer {} with activation of shape {}".format(idx + 1, acts[idx].shape))
-                act_vec = approximate_relu(acts[idx], layer_weight.shape[1], args, method)
+                act_vec = approximate_relu(acts[layer], layer_weight.shape[1], args, method)
                 print("act_vec.shape: ", act_vec.shape)
                 print("layer_weight.shape: ", layer_weight.shape)
                 assert act_vec.shape == layer_weight.shape
@@ -321,12 +321,12 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
             else:
                 print(f"Merge last layer {layer} with {grp[0]}")
                 pre_weight = layer_weight @ pre_weight
-                setattr(args, "num_hidden_nodes" + str(l1 + 1), layer_weight.shape[0]) # check wth is this
+                setattr(args, "num_hidden_nodes" + str(len(new_weight) + 1), layer_weight.shape[0]) # check wth is this
                 new_weight.append(pre_weight)
                 pre_weight = torch.eye(layer_weight.shape[0]).cuda(args.gpu_id)
                 setattr(args, "num_hidden_layers", n)
-    print(new_weights)
-    return new_weights, args
+    print(new_weight)
+    return new_weight, args
 
 
 def compress_model(args, networks, accuracies, num_layers, model_names=None):
