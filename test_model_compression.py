@@ -265,7 +265,7 @@ def approximate_relu(act_mat, num_columns, args, method):
     :return: a matrix in which each row has the same value
     """
     if method == "sum":
-        act_vec = act_mat.sum(axis=0) >= 0
+        act_vec = act_mat.sum(axis=1) >= 0
     elif method == "majority":
         act_vec = (act_mat > 0).mean(axis=0) >= 0.5
     elif method == "avg":
