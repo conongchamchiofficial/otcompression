@@ -251,6 +251,19 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
     return dissimilarity_matrix, x, y
 
 
+# def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
+#     """
+#     Choose top-k layers to merge in large model
+
+#     :param 
+#     """
+#     I = []
+#     if args.compression_only:
+#         dissimilarity_matrix
+    
+#     return I    
+
+
 def approximate_relu(act_mat, num_columns, args, method):
     """
     Approximate ReLU activation function by a diagonal matrix
@@ -290,7 +303,6 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
     :return: list of weight matrix of the new model and the updated args
     """
     new_weight = []
-    n = num_layer0 - 1
     network_params = list(network0.named_parameters())
     
     if args.dataset == "mnist":
@@ -319,7 +331,7 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
                 setattr(args, "num_hidden_nodes" + str(len(new_weight) + 1), layer_weight.shape[0]) # check wth is this
                 new_weight.append(pre_weight)
                 pre_weight = torch.eye(layer_weight.shape[0]).cuda(args.gpu_id)
-                setattr(args, "num_hidden_layers", n)
+    setattr(args, "num_hidden_layers", len(new_weight))
 
     return new_weight, args
 
