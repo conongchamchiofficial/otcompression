@@ -264,7 +264,7 @@ def approximate_relu(act_mat, num_columns, args, method):
     :return: a matrix in which each row has the same value
     """
     if method == "sum":
-        act_vec = act_mat.sum(axis=1) >= 0
+        act_vec = act_mat.sum(axis=0) >= 0
     elif method == "majority":
         act_vec = (act_mat > 0).mean(axis=0) >= 0.5
     elif method == "avg":
@@ -274,9 +274,9 @@ def approximate_relu(act_mat, num_columns, args, method):
     print("act_vec def: ", act_vec)
     print("shape: ", act_vec.shape)
     if isinstance(act_vec, torch.Tensor):
-        return act_vec.unsqueeze(0).repeat(num_columns, 1).T
+        return act_vec.unsqueeze(1).repeat(1, num_columns)
     else:
-        return np.tile(act_vec, (num_columns, 1)).T
+        return np.tile(act_vec, (1, num_columns))
 
 
 def merge_layers(args, network0, num_layer0, acts, I, method):
@@ -304,12 +304,12 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
         raise ValueError
     pre_weight = torch.eye(input_dim).cuda(args.gpu_id)
     
-    for grp in I:
-        for idx, layer in enumerate(grp):
+    for idx_grp, grp in enumerate(I):
+        for idx_layer, layer in enumerate(grp):
             (_, layer_weight) = network_params[layer]
-            if idx < len(grp) - 1:
-                print(f"Merge layer {layer} with {grp[-1]}")
-                print("Approximate ReLU at hidden layer {} with activation of shape {}".format(idx + 1, acts[idx].shape))
+            if layer != grp[-1]:
+                print(f"Merge layer {layer} with {grp[idx_layer + 1]}")
+                print("Approximate ReLU at hidden layer {} with activation of shape {}".format(layer + 1, acts[layer].shape))
                 act_vec = approximate_relu(acts[layer], layer_weight.shape[1], args, method)
                 print("act_vec.shape: ", act_vec.shape)
                 print("layer_weight.shape: ", layer_weight.shape)
@@ -321,7 +321,7 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
                 layer_weight = layer_weight * act_vec
                 pre_weight = layer_weight @ pre_weight
             else:
-                print(f"Merge last layer {layer} with {grp[0]}")
+                print(f"Main layer {layer} with {grp[0]}")
                 pre_weight = layer_weight @ pre_weight
                 setattr(args, "num_hidden_nodes" + str(len(new_weight) + 1), layer_weight.shape[0]) # check wth is this
                 new_weight.append(pre_weight)
