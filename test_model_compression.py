@@ -69,7 +69,6 @@ def get_activation_matrices(args, networks, personal_dataset=None, config=None, 
                 reorder_dim.extend([0, 1])
                 layer_act = layer_act.permute(*reorder_dim).contiguous()
             layer_act = layer_act.view(layer_act.size(0), -1)
-            print("new layer_act: ", layer_act)
             model_act.append(layer_act)
 
         # exclude the activation of output layer
@@ -272,7 +271,8 @@ def approximate_relu(act_mat, num_columns, args, method):
         act_vec = ((act_mat > 0) * 1.0).mean(axis=0)
     else:
         raise NotImplementedError
-
+    print("act_vec def: ", act_vec)
+    print("shape: ", act_vec.shape)
     if isinstance(act_vec, torch.Tensor):
         return act_vec.unsqueeze(0).repeat(num_columns, 1).T
     else:
