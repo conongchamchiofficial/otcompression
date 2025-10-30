@@ -149,7 +149,6 @@ def get_cost_matrix_conv_layer(x, model_name, args, dissimilarity_matrix):
         if layer_idx[idx + 1] - layer_idx[idx] > 1:
             cost_matrix = get_cost_matrix(x[layer_idx[idx] : layer_idx[idx + 1]], x[layer_idx[idx] : layer_idx[idx + 1]], args)
             dissimilarity_matrix[layer_idx[idx] : layer_idx[idx + 1], layer_idx[idx] : layer_idx[idx + 1]] = cost_matrix
-            print("Updating dissimilarity_matrix: ", dissimilarity_matrix)
 
     return dissimilarity_matrix
 
@@ -198,7 +197,6 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
 
     # initialize dissmilarity matrix among hidden layers
     dissimilarity_matrix = np.full((num_layers[0] - 1, num_layers[0] - 1), np.inf)
-    print("dissimilarity_matrix: ", dissimilarity_matrix)
     
     # get layer representation of models (check x, y for layers within model)
     layer_representations = []
@@ -244,11 +242,11 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
             dissimilarity_matrix = get_cost_matrix(x[classifier_idx[0] :], args)
             #print("Cost matrix between layers {}-{} of model 0 is \n{}".format(classifier_idx[0], len(x), dissimilarity_matrix))
     else:
-        print(x[classifier_idx[0] :])
+        #print(x[classifier_idx[0] :])
         dissimilarity_matrix = get_cost_matrix(x[classifier_idx[0] :], args)
         #print("Cost matrix between layers {}-{} of model 0 is \n{}".format(classifier_idx[0], len(x), dissimilarity_matrix))
 
-    print("Optimal map from model 1 to model 0 is {}".format(dissimilarity_matrix))
+    print("Dissimilarity matrix among layers of model 0 is {}".format(dissimilarity_matrix))
 
     return dissimilarity_matrix, x, y
 
@@ -271,8 +269,7 @@ def approximate_relu(act_mat, num_columns, args, method):
         act_vec = ((act_mat > 0) * 1.0).mean(axis=1)
     else:
         raise NotImplementedError
-    print("act_vec def: ", act_vec)
-    print("shape: ", act_vec.shape)
+
     if isinstance(act_vec, torch.Tensor):
         return act_vec.unsqueeze(1).repeat(1, num_columns)
     else:
@@ -311,23 +308,19 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
                 print(f"Merge layer {layer} with {grp[idx_layer + 1]}")
                 print("Approximate ReLU at hidden layer {} with activation of shape {}".format(layer + 1, acts[layer].shape))
                 act_vec = approximate_relu(acts[layer], layer_weight.shape[1], args, method)
-                print("act_vec.shape: ", act_vec.shape)
-                print("layer_weight.shape: ", layer_weight.shape)
-                print("layer_weight.shape[0]: ", layer_weight.shape[0])
-                print("pre_weight: ", pre_weight)
                 assert act_vec.shape == layer_weight.shape
                 if not isinstance(act_vec, torch.Tensor):
                     act_vec = torch.from_numpy(act_vec).cuda(args.gpu_id)
                 layer_weight = layer_weight * act_vec
                 pre_weight = layer_weight @ pre_weight
             else:
-                print(f"Main layer {layer} with {grp[0]}")
+                print(f"Main layer {layer}")
                 pre_weight = layer_weight @ pre_weight
                 setattr(args, "num_hidden_nodes" + str(len(new_weight) + 1), layer_weight.shape[0]) # check wth is this
                 new_weight.append(pre_weight)
                 pre_weight = torch.eye(layer_weight.shape[0]).cuda(args.gpu_id)
                 setattr(args, "num_hidden_layers", n)
-    print(new_weight)
+
     return new_weight, args
 
 
