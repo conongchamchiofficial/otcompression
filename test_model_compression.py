@@ -251,17 +251,45 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
     return dissimilarity_matrix, x, y
 
 
-# def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
-#     """
-#     Choose top-k layers to merge in large model
+def find_min_position(matrix):
+    """
+    Finds the position (row and column indices) of the minimum value in a list of lists.
+    """
+    min_value = float('inf')  # Initialize with a very large value
+    min_row_index = -1
+    min_col_index = -1
 
-#     :param 
-#     """
-#     I = []
-#     if args.compression_only:
-#         dissimilarity_matrix
+    for row_index, inner_list in enumerate(matrix):
+        for col_index, value in enumerate(inner_list):
+            if value < min_value:
+                min_value = value
+                min_row_index = row_index
+                min_col_index = col_index
+
+    return min_row_index, min_col_index, min_value
+
+
+def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
+    """
+    Choose top-k layers to merge in large model
+
+    :param 
+    """
+    I = []
+    args.desired_number_of_hidden_layers
+    if args.compression_only and args.desired_number_of_layers <= num_layer0:
+        for i in range(args.desired_number_of_hidden_layers)
+            min_row_index, min_col_index, min_value = find_min_position(dissimilarity_matrix)
+            if min_row_index == min_col_index - 1:
+                I.append(range(min_row_index, min_col_index + 1))
+            elif min_row_index < min_col_index - 1:
+                I.append(range(min_row_index, min_col_index + 1))
+            elif 
+            
+    else:
+        raise NotImplementedError
     
-#     return I    
+    return I    
 
 
 def approximate_relu(act_mat, num_columns, args, method):
