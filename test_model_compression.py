@@ -277,14 +277,24 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
     """
     I = []
     args.desired_number_of_hidden_layers
-    if args.compression_only and args.desired_number_of_layers <= num_layer0:
-        for i in range(args.desired_number_of_hidden_layers)
+    if args.compression_only and args.desired_number_of_hidden_layers <= num_layer0 - 1:
+        for _ in range(num_layer0 - args.desired_number_of_hidden_layers):
             min_row_index, min_col_index, min_value = find_min_position(dissimilarity_matrix)
-            if min_row_index == min_col_index - 1:
+            for idx, grp in enumerate(I):
+                if min_row_index == grp[-1]:
+                    I[idx].append(min_col_index)
+                    break
+            if min_col_index - min_row_index == 1:
                 I.append(range(min_row_index, min_col_index + 1))
-            elif min_row_index < min_col_index - 1:
+                for j in range(len(min_row_index):
+                    dissimilarity_matrix[min_row_index][j] = float('inf')
+            elif min_col_index - min_row_index > 1:
                 I.append(range(min_row_index, min_col_index + 1))
-            elif 
+                for i in range(min_row_index, min_col_index):
+                    for j in range(min_row_index + 1, min_col_index + 1):
+                        dissimilarity_matrix[i][j] = float('inf')
+            else:
+                NotImplementedError
             
     else:
         raise NotImplementedError
