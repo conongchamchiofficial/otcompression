@@ -275,6 +275,7 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
 
     :param 
     """
+    # Choose groups of layers that needed to be compressed
     I = []
     inner_group = []
     num_hidden_layer = num_layer0 - 1
@@ -345,8 +346,9 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
         print("Case 4")
         raise NotImplementedError
 
+    # Add the rest individual layers
     flat_I = [layer for group in I for layer in group]
-    for i in range[num_layer0]:
+    for i in range(num_layer0):
         if i not in flat_I:
             I.append([i])
     return I    
