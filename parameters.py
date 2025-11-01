@@ -96,6 +96,7 @@ def get_parser():
     # for simplenet
     parser.add_argument('--num-hidden-nodes', default=400, type=int, help='simplenet: number of hidden nodes in the only hidden layer')
     # for mlpnet
+    parser.add_argument("--num-hidden-layers", default=3, type=int, help="mlpnet: number of hidden layers")
     parser.add_argument('--num-hidden-nodes1', default=400, type=int,
                         help='mlpnet: number of hidden nodes in the hidden layer 1')
     parser.add_argument('--num-hidden-nodes2', default=200, type=int,
@@ -104,6 +105,8 @@ def get_parser():
                         help='mlpnet: number of hidden nodes in the hidden layer 3')
     parser.add_argument('--num-hidden-nodes4', default=50, type=int,
                         help='mlpnet: number of hidden nodes in the hidden layer 3')
+
+    parser.add_argument("--desired-number-of-hidden-layers", default=2, type=int, help="mlpnet: compressed model's number of hidden layers")
 
     parser.add_argument('--sweep-id', default=-1, type=int, help='sweep id ')
 
@@ -281,6 +284,8 @@ def get_parser():
     parser.add_argument('--dist-epochs', default=60, type=int, help='number of distillation epochs')
 
     parser.add_argument('--handle-skips', action='store_true', help='handle shortcut skips in resnet which decrease dimension')
+
+    parser.add_argument("--compression-only", action="store_true", help="only compress models without running model fusion")
     return parser
 
 def get_parameters():
