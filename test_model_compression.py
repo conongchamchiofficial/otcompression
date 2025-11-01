@@ -277,52 +277,55 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
     """
     I = []
     inner_group = []
+    num_hidden_layer = num_layer0 - 1
     num_merged_grp = 0
-    if args.compression_only and args.desired_number_of_hidden_layers <= num_layer0:
-        while num_merged_grp < (num_layer0 - args.desired_number_of_hidden_layers):
+    if args.compression_only and args.desired_number_of_hidden_layers <= num_hidden_layer:
+        while num_merged_grp < (num_hidden_layer - args.desired_number_of_hidden_layers):
             min_row_index, min_col_index, min_value = find_min_position(dissimilarity_matrix)
             for idx, grp in enumerate(I):
                 if min_row_index == grp[-1]:
                     if min_col_index - min_row_index == 1:
                         I[idx].append(min_col_index + 1)
                         for i in range(min_row_index + 1):
-                            for j in range(min_col_index, num_layer0):
+                            for j in range(min_col_index, num_hidden_layer):
                                 dissimilarity_matrix[i][j] = float('inf')
                         num_merged_grp += 1
                         inner_group = []
                     elif min_col_index - min_row_index > 1:
                         I[idx].append(range(min_row_index + 1, min_col_index + 1))
                         for i in range(min_col_index):
-                            for j in range(min_row_index, num_layer0):
+                            for j in range(min_row_index, num_hidden_layer):
                                 dissimilarity_matrix[i][j] = float('inf')
                         num_merged_grp += min_col_index - min_row_index
                         inner_group = []
                     else:
+                        print("Case 1")
                         NotImplementedError                        
                     break
                 elif min_col_index == grp[0]:
                     if min_col_index - min_row_index == 1:
                         I[idx].insert(0, min_col_index)
                         for i in range(min_row_index + 1):
-                            for j in range(min_col_index, num_layer0):
+                            for j in range(min_col_index, num_hidden_layer):
                                 dissimilarity_matrix[i][j] = float('inf')
                         num_merged_grp += 1
                         inner_group = []
                     elif min_col_index - min_row_index > 1:
                         I[idx].insert(0, range(min_row_index, min_col_index))
                         for i in range(min_col_index):
-                            for j in range(min_row_index, num_layer0):
+                            for j in range(min_row_index, num_hidden_layer):
                                 dissimilarity_matrix[i][j] = float('inf')
                         num_merged_grp += min_col_index - min_row_index   
                         inner_group = []
                     else:
+                        print("Case 2")
                         NotImplementedError  
                         
             if min_col_index - min_row_index == 1:
                 inner_group.append(range(min_row_index, min_col_index + 1))
                 I.append(inner_group)
                 for i in range(min_row_index + 1):
-                    for j in range(min_col_index, num_layer0):
+                    for j in range(min_col_index, num_hidden_layer):
                         dissimilarity_matrix[i][j] = float('inf')
                 num_merged_grp += 1
                 inner_group = []
@@ -330,16 +333,22 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
                 inner_group.append(range(min_row_index, min_col_index + 1))
                 I.append(inner_group)
                 for i in range(min_col_index):
-                    for j in range(min_row_index, num_layer0):
+                    for j in range(min_row_index, num_hidden_layer):
                         dissimilarity_matrix[i][j] = float('inf')
                 num_merged_grp += min_col_index - min_row_index
                 inner_group = []
             else:
+                print("Case 3")
                 NotImplementedError
             
     else:
+        print("Case 4")
         raise NotImplementedError
-    
+
+    flat_I = [layer for group in list for layer in group]
+    for i in range[num_layer0]:
+        if i not in flat_I:
+            I.append([i])
     return I    
 
 
