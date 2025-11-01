@@ -345,7 +345,7 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
         print("Case 4")
         raise NotImplementedError
 
-    flat_I = [layer for group in list for layer in group]
+    flat_I = [layer for group in I for layer in group]
     for i in range[num_layer0]:
         if i not in flat_I:
             I.append([i])
