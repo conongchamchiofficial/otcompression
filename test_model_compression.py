@@ -289,12 +289,14 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
                             for j in range(min_col_index, num_layer0):
                                 dissimilarity_matrix[i][j] = float('inf')
                         num_merged_grp += 1
+                        inner_group = []
                     elif min_col_index - min_row_index > 1:
                         I[idx].append(range(min_row_index + 1, min_col_index + 1))
                         for i in range(min_col_index):
                             for j in range(min_row_index, num_layer0):
                                 dissimilarity_matrix[i][j] = float('inf')
                         num_merged_grp += min_col_index - min_row_index
+                        inner_group = []
                     else:
                         NotImplementedError                        
                     break
@@ -305,12 +307,14 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
                             for j in range(min_col_index, num_layer0):
                                 dissimilarity_matrix[i][j] = float('inf')
                         num_merged_grp += 1
+                        inner_group = []
                     elif min_col_index - min_row_index > 1:
                         I[idx].insert(0, range(min_row_index, min_col_index))
                         for i in range(min_col_index):
                             for j in range(min_row_index, num_layer0):
                                 dissimilarity_matrix[i][j] = float('inf')
-                        num_merged_grp += min_col_index - min_row_index                       
+                        num_merged_grp += min_col_index - min_row_index   
+                        inner_group = []
                     else:
                         NotImplementedError  
                         
@@ -321,6 +325,7 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
                     for j in range(min_col_index, num_layer0):
                         dissimilarity_matrix[i][j] = float('inf')
                 num_merged_grp += 1
+                inner_group = []
             elif min_col_index - min_row_index > 1:
                 inner_group.append(range(min_row_index, min_col_index + 1))
                 I.append(inner_group)
@@ -328,6 +333,7 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
                     for j in range(min_row_index, num_layer0):
                         dissimilarity_matrix[i][j] = float('inf')
                 num_merged_grp += min_col_index - min_row_index
+                inner_group = []
             else:
                 NotImplementedError
             
@@ -424,7 +430,8 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     dissimilarity_matrix, config_param0, config_param1 = get_dissimilarity_matrix(args, networks, num_layers, model_names)
 
     print("------ Choose top-k layers to merge ------")
-    I = [[0, 1], [2, 3]]
+    I = choose_layers_to_merge(args, networks[0], num_layers[0], dissimilarity_matrix)
+    print(I)
     print("------ Model compression by merging layers via OT ------")
     new_weights, args = merge_layers(args, networks[0], num_layers[0], config_param0, I, method=args.relu_approx_method)
     
