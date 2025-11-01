@@ -327,7 +327,7 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
                         NotImplementedError  
                         
             if min_col_index - min_row_index == 1:
-                inner_group.append(layer for layer in range(min_row_index, min_col_index + 1))
+                inner_group = [layer for layer in range(min_row_index, min_col_index + 1)]
                 I.append(inner_group)
                 for i in range(min_row_index + 1):
                     for j in range(min_col_index, num_hidden_layer):
