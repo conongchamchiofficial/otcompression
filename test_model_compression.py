@@ -265,6 +265,10 @@ def find_min_position(matrix):
                 min_value = value
                 min_row_index = row_index
                 min_col_index = col_index
+    print("min_value: ", min_value, type(min_value))
+    print("min_row_index: ", min_row_index, type(min_row_index))
+    print("min_col_index: ", min_col_index, type(min_col_index))
+    
 
     return min_row_index, min_col_index, min_value
 
