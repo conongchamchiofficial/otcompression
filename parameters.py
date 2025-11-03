@@ -293,6 +293,31 @@ def get_parameters():
     parser = get_parser()
     base_args = parser.parse_args()
 
+    # handle configs for MLPNETs
+    num_configs = len(base_args.net_config)
+    if num_configs > 0:
+        setattr(base_args, "parse_config", True)
+        assert num_configs == base_args.num_models
+    else:
+        setattr(base_args, "parse_config", False)
+
+    for i in range(num_configs):
+        setattr(base_args, f"model{i}_config", base_args.net_config[i])
+
+    # check model name list
+    if len(base_args.model_name_list) > 0:
+        assert base_args.num_models == len(base_args.model_name_list)
+        base_args.fused_model_name = base_args.model_name_list[0]
+    else:
+        if base_args.second_model_name is None:
+            base_args.second_model_name = base_args.model_name
+        base_args.model_name_list = [base_args.model_name, base_args.second_model_name]
+        base_args.fused_model_name = base_args.model_name
+
+    if base_args.options_type != "generic":
+        # This allows adding specific arguments that might be needed for a particular task
+        raise NotImplementedError
+
     if base_args.options_type != 'generic':
         # This allows adding specific arguments that might be needed for a particular task
         raise NotImplementedError
