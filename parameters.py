@@ -293,16 +293,16 @@ def get_parameters():
     parser = get_parser()
     base_args = parser.parse_args()
 
-    # handle configs for MLPNETs
-    num_configs = 2 # len(base_args.net_config)
-    if num_configs > 0:
-        setattr(base_args, "parse_config", True)
-        assert num_configs == base_args.num_models
-    else:
-        setattr(base_args, "parse_config", False)
+    # # handle configs for MLPNETs
+    # num_configs = len(base_args.net_config)
+    # if num_configs > 0:
+    #     setattr(base_args, "parse_config", True)
+    #     assert num_configs == base_args.num_models
+    # else:
+    #     setattr(base_args, "parse_config", False)
 
-    for i in range(num_configs):
-        setattr(base_args, f"model{i}_config", base_args.net_config[i])
+    # for i in range(num_configs):
+    #     setattr(base_args, f"model{i}_config", base_args.net_config[i])
 
     # check model name list
     if len(base_args.model_name_list) > 0:
