@@ -158,6 +158,7 @@ def get_pretrained_model(args, path, data_separated=False, idx=-1):
     # the fused model has the same config as model 1
     if args.model_name == "mlpnet":
         load_args = state["args"]
+        print(load_args)
         if ("parse_config" in load_args.keys()) and (load_args["parse_config"]):
             net_config = load_args["net_config"][idx]
             setattr(args, "num_hidden_layers", len(net_config))
