@@ -73,7 +73,7 @@ def get_activation_matrices(args, networks, personal_dataset=None, config=None, 
 
         # exclude the activation of output layer
         list_act.append(model_act[:-1])
-
+    
     return list_act
 
 
@@ -220,6 +220,12 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
         # act_end_time = time.perf_counter()
         # act_time = act_end_time - act_st_time
         assert args.layer_metric in ["cka", "cca", "wd"]
+    
+    a = get_weight_matrices(networks[0])
+    print("representation wts: ", a)
+    print(a.shape)
+    print("representation acts: ", x)
+    print(x.shape)
     
     # separate where is the FC layer start
     classifier_idx = [0, 0]
