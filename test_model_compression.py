@@ -41,7 +41,7 @@ def get_weight_matrices(network):
     model_weights = []
 
     for _, layer_weight in network.named_parameters():
-        model_weights.append(layer_weight)
+        model_weights.append(layer_weight.cpu())
 
     return  np.array(model_weights)[:-1]
 
