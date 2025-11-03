@@ -294,7 +294,7 @@ def get_parameters():
     base_args = parser.parse_args()
 
     # handle configs for MLPNETs
-    num_configs = len(base_args.net_config)
+    num_configs = 2 # len(base_args.net_config)
     if num_configs > 0:
         setattr(base_args, "parse_config", True)
         assert num_configs == base_args.num_models
