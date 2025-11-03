@@ -121,6 +121,59 @@ class MlpNet(nn.Module):
         else:
             return F.log_softmax(x)
 
+class MlpNetFromConfig(nn.Module):
+    def __init__(self, args, hidden_layer_sizes, width_ratio=-1):
+        super(MlpNetFromConfig, self).__init__()
+        if args.dataset == "mnist":
+            # 28 x 28 x 1
+            input_dim = 784
+        elif args.dataset.lower()[0:7] == "cifar10":
+            # 32 x 32 x 3
+            input_dim = 3072
+        elif args.dataset.lower() == "tinyimagenet":
+            # 64 x 64 x 3
+            input_dim = 12288
+        if width_ratio != -1:
+            self.width_ratio = width_ratio
+        else:
+            self.width_ratio = 1
+        self.num_hidden_layers = len(hidden_layer_sizes)
+
+        self.fc = {}
+        for layer_idx in range(self.num_hidden_layers + 1):
+            if layer_idx == 0:  # input layer
+                self.fc[layer_idx] = nn.Linear(
+                    input_dim, int(hidden_layer_sizes[0] / self.width_ratio), bias=not args.disable_bias
+                )
+                self.add_module("fc" + str(layer_idx + 1), self.fc[layer_idx])
+            elif layer_idx == self.num_hidden_layers:  # output layer
+                self.fc[layer_idx] = nn.Linear(
+                    int(hidden_layer_sizes[-1] / self.width_ratio), 10, bias=not args.disable_bias
+                )
+                self.add_module("fc" + str(layer_idx + 1), self.fc[layer_idx])
+            else:  # hidden layer
+                self.fc[layer_idx] = nn.Linear(
+                    int(hidden_layer_sizes[layer_idx - 1] / self.width_ratio),
+                    int(hidden_layer_sizes[layer_idx] / self.width_ratio),
+                    bias=not args.disable_bias,
+                )
+                self.add_module("fc" + str(layer_idx + 1), self.fc[layer_idx])
+
+        self.enable_dropout = args.enable_dropout
+
+    def forward(self, x, disable_logits=False):
+        x = x.view(x.shape[0], -1)
+        for layer_idx in range(0, self.num_hidden_layers):
+            x = F.relu(self.fc[layer_idx](x))
+            if self.enable_dropout:
+                x = F.dropout(x, training=self.training)
+        x = self.fc[self.num_hidden_layers](x)
+
+        if disable_logits:
+            return x
+        else:
+            return F.log_softmax(x, dim=1)
+
 
 class SmallMlpNet(nn.Module):
     def __init__(self, args):
