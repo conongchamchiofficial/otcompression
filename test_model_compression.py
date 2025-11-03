@@ -304,7 +304,6 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
                         num_merged_grp += min_col_index - min_row_index
                         inner_group = []
                     else:
-                        print("Case 1")
                         NotImplementedError                        
                     break
                 elif min_col_index == grp[0]:
@@ -323,7 +322,6 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
                         num_merged_grp += min_col_index - min_row_index   
                         inner_group = []
                     else:
-                        print("Case 2")
                         NotImplementedError  
                         
             if min_col_index - min_row_index == 1:
@@ -343,11 +341,9 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
                 num_merged_grp += min_col_index - min_row_index
                 inner_group = []
             else:
-                print("Case 3")
                 NotImplementedError
             
     else:
-        print("Case 4")
         raise NotImplementedError
 
     # Add the rest individual layers
@@ -355,6 +351,7 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
     for i in range(num_layer0):
         if i not in flat_I:
             I.append([i])
+    I.sort()
     return I    
 
 
