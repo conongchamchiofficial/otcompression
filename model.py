@@ -19,7 +19,12 @@ def get_model_from_name(args, idx=-1):
     elif args.model_name == 'smallmlpnet':
         return SmallMlpNet(args)
     elif args.model_name == 'mlpnet':
-        return MlpNet(args, width_ratio=width_ratio)
+        if args.parse_config:
+            assert 0 <= idx <= args.num_models - 1
+            hidden_layer_sizes = getattr(args, f"model{idx}_config")
+            return MlpNetFromConfig(args, hidden_layer_sizes, width_ratio=width_ratio)
+        else:
+            return MlpNet(args, width_ratio=width_ratio)
     elif args.model_name == 'bigmlpnet':
         return BigMlpNet(args)
     elif args.model_name == 'cifarmlpnet':
