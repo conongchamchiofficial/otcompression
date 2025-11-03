@@ -424,6 +424,18 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
                 pre_weight = torch.eye(layer_weight.shape[0]).cuda(args.gpu_id)
     setattr(args, "num_hidden_layers", len(new_weight))
 
+    if args.dataset == "mnist":
+        _, test_loader = get_dataloader(args)
+    else:
+        _, test_loader = cifar_train.get_dataset(args.config, to_download=args.to_download)
+        
+    if args.parse_config:
+        print("Change configuration from list of hidden_layer_sizes to num_hidden_layers/num_hidden_nodes style.")
+        setattr(args, "parse_config", False)
+        
+    new_acc, new_network = get_network_from_param_list(args, param_list, test_loader)
+    print(new_acc)
+
     return new_weight, args
 
 
@@ -446,6 +458,7 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     print(I)
     print("------ Model compression by merging layers via OT ------")
     new_weights, args = merge_layers(args, networks[0], num_layers[0], config_param0, I, method=args.relu_approx_method)
+    
     
     return args, networks, accuracies, num_layers, model_names
 
