@@ -71,6 +71,8 @@ def get_activation_matrices(args, networks, personal_dataset=None, config=None, 
                 reorder_dim.extend([0, 1])
                 layer_act = layer_act.permute(*reorder_dim).contiguous()
             layer_act = layer_act.view(layer_act.size(0), -1)
+            print("layer_act: ", layer_act)
+            print("layer_act.shape: ", layer_act.shape)
             model_act.append(layer_act)
 
         # exclude the activation of output layer
