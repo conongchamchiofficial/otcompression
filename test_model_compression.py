@@ -41,11 +41,9 @@ def get_weight_matrices(network):
     model_weights = []
 
     for _, layer_weight in network.named_parameters():
-        print("layer_weight: ", layer_weight)
-        print("layer_weight.shape: ", layer_weight.shape)
         model_weights.append(layer_weight)
     
-    return  np.array(model_weights)[:-1]
+    return  model_weights[:-1]
 
 
 def get_activation_matrices(args, networks, personal_dataset=None, config=None, is_wd=False):
@@ -71,8 +69,6 @@ def get_activation_matrices(args, networks, personal_dataset=None, config=None, 
                 reorder_dim.extend([0, 1])
                 layer_act = layer_act.permute(*reorder_dim).contiguous()
             layer_act = layer_act.view(layer_act.size(0), -1)
-            print("layer_act: ", layer_act)
-            print("layer_act.shape: ", layer_act.shape)
             model_act.append(layer_act)
 
         # exclude the activation of output layer
