@@ -221,12 +221,6 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
         # act_time = act_end_time - act_st_time
         assert args.layer_metric in ["cka", "cca", "wd"]
     
-    a = get_weight_matrices(networks[0])
-    print("representation wts: ", a)
-    print(a[0].shape)
-    print("representation acts: ", x)
-    print(x[0].shape)
-    
     # separate where is the FC layer start
     classifier_idx = [0, 0]
     for i in range(2):
