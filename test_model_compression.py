@@ -223,9 +223,9 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
     
     a = get_weight_matrices(networks[0])
     print("representation wts: ", a)
-    print(a.shape)
+    print(a[0].shape)
     print("representation acts: ", x)
-    print(x.shape)
+    print(x[0].shape)
     
     # separate where is the FC layer start
     classifier_idx = [0, 0]
