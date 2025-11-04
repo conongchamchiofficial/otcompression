@@ -41,10 +41,11 @@ def get_weight_matrices(network):
     model_weights = []
 
     for _, layer_weight in network.named_parameters():
-        model_weights.append(layer_weight.cpu())
-    model_weights = model_weights.numpy()
+        print("layer_weight: ", layer_weight)
+        print("layer_weight.shape: ", layer_weight.shape)
+        model_weights.append(layer_weight)
     
-    return  model_weights[:-1]
+    return  np.array(model_weights)[:-1]
 
 
 def get_activation_matrices(args, networks, personal_dataset=None, config=None, is_wd=False):
