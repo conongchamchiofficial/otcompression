@@ -323,25 +323,25 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
                         inner_group = []
                     else:
                         NotImplementedError  
-                        
-            if min_col_index - min_row_index == 1:
-                inner_group = [layer for layer in range(min_row_index, min_col_index + 1)]
-                I.append(inner_group)
-                for i in range(min_row_index + 1):
-                    for j in range(min_col_index, num_hidden_layer):
-                        dissimilarity_matrix[i][j] = float('inf')
-                num_merged_grp += 1
-                inner_group = []
-            elif min_col_index - min_row_index > 1:
-                inner_group.append(range(min_row_index, min_col_index + 1))
-                I.append(inner_group)
-                for i in range(min_col_index):
-                    for j in range(min_row_index, num_hidden_layer):
-                        dissimilarity_matrix[i][j] = float('inf')
-                num_merged_grp += min_col_index - min_row_index
-                inner_group = []
-            else:
-                NotImplementedError
+                else:
+                    if min_col_index - min_row_index == 1:
+                        inner_group = [layer for layer in range(min_row_index, min_col_index + 1)]
+                        I.append(inner_group)
+                        for i in range(min_row_index + 1):
+                            for j in range(min_col_index, num_hidden_layer):
+                                dissimilarity_matrix[i][j] = float('inf')
+                        num_merged_grp += 1
+                        inner_group = []
+                    elif min_col_index - min_row_index > 1:
+                        inner_group.append(range(min_row_index, min_col_index + 1))
+                        I.append(inner_group)
+                        for i in range(min_col_index):
+                            for j in range(min_row_index, num_hidden_layer):
+                                dissimilarity_matrix[i][j] = float('inf')
+                        num_merged_grp += min_col_index - min_row_index
+                        inner_group = []
+                    else:
+                        NotImplementedError
             
     else:
         raise NotImplementedError
