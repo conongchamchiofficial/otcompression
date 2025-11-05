@@ -290,13 +290,15 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix, des
                         for i in range(min_row_index + 1):
                             for j in range(min_col_index, num_hidden_layer):
                                 dissimilarity_matrix[i][j] = float('inf')
+                        num_merged_grp += min_col_index - min_row_index
+                        inner_group = []
                     elif min_col_index - min_row_index > 1:
                         I[idx].append(layer for layer in range(min_row_index + 1, min_col_index + 1))
                         for i in range(min_col_index):
                             for j in range(min_row_index, num_hidden_layer):
                                 dissimilarity_matrix[i][j] = float('inf')
-                    num_merged_grp += min_col_index - min_row_index
-                    inner_group = []
+                        num_merged_grp += min_col_index - min_row_index
+                        inner_group = []
                     min_value = float('inf')  # Initialize with a very large value
                     min_row_index = -1
                     min_col_index = -1
@@ -307,13 +309,15 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix, des
                         for i in range(min_row_index + 1):
                             for j in range(min_col_index, num_hidden_layer):
                                 dissimilarity_matrix[i][j] = float('inf')
+                        num_merged_grp += min_col_index - min_row_index
+                        inner_group = []
                     elif min_col_index - min_row_index > 1:
                         I[idx].insert(0, (layer for layer in range(min_row_index, min_col_index)))
                         for i in range(min_col_index):
                             for j in range(min_row_index, num_hidden_layer):
                                 dissimilarity_matrix[i][j] = float('inf')
-                    num_merged_grp += min_col_index - min_row_index   
-                    inner_group = []
+                        num_merged_grp += min_col_index - min_row_index   
+                        inner_group = []
                     min_value = float('inf')  # Initialize with a very large value
                     min_row_index = -1
                     min_col_index = -1
@@ -325,14 +329,16 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix, des
                 for i in range(min_row_index + 1):
                     for j in range(min_col_index, num_hidden_layer):
                         dissimilarity_matrix[i][j] = float('inf')
+                num_merged_grp += min_col_index - min_row_index
+                inner_group = []
             elif min_col_index - min_row_index > 1:
                 inner_group.append(range(min_row_index, min_col_index + 1))
                 I.append(inner_group)
                 for i in range(min_col_index):
                     for j in range(min_row_index, num_hidden_layer):
                         dissimilarity_matrix[i][j] = float('inf')
-            num_merged_grp += min_col_index - min_row_index
-            inner_group = []
+                num_merged_grp += min_col_index - min_row_index
+                inner_group = []
             min_value = float('inf')  # Initialize with a very large value
             min_row_index = -1
             min_col_index = -1
@@ -429,7 +435,7 @@ def merge_layers(args, networks, num_layers, model_names, acts, I, method):
         print("Change configuration from list of hidden_layer_sizes to num_hidden_layers/num_hidden_nodes style.")
         setattr(args, "parse_config", False)
         
-    new_acc, new_network = get_network_from_param_list(args, new_weights, test_loader, model_name=args.fused_model_name, model_config=model_configs[0])
+    new_acc, new_network = get_network_from_param_list(args, new_weights, test_loader, model_name=args.fused_model_name)
     print(new_acc)
 
     return new_acc, new_network, args
