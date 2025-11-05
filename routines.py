@@ -154,22 +154,22 @@ def get_pretrained_model(args, path, data_separated=False, idx=-1):
             ),
         )
 
-    # # change the MlpNet config
-    # # the fused model has the same config as model 1
-    # if args.model_name == "mlpnet":
-    #     load_args = state["args"]
-    #     print(load_args)
-    #     if ("parse_config" in load_args.keys()) and (load_args["parse_config"]):
-    #         net_config = load_args["net_config"][idx]
-    #         setattr(args, "num_hidden_layers", len(net_config))
-    #         for layer_idx in range(1, args.num_hidden_layers + 1):
-    #             param_name = "num_hidden_nodes" + str(layer_idx)
-    #             setattr(args, param_name, net_config[layer_idx - 1])
-    #     else:
-    #         setattr(args, "num_hidden_layers", load_args["num_hidden_layers"])
-    #         for layer_idx in range(1, args.num_hidden_layers + 1):
-    #             param_name = "num_hidden_nodes" + str(layer_idx)
-    #             setattr(args, param_name, load_args[param_name])
+    # change the MlpNet config
+    # the fused model has the same config as model 1
+    if args.model_name == "mlpnet":
+        load_args = state["args"]
+        print(load_args)
+        if ("parse_config" in load_args.keys()) and (load_args["parse_config"]):
+            net_config = load_args["net_config"][idx]
+            setattr(args, "num_hidden_layers", len(net_config))
+            for layer_idx in range(1, args.num_hidden_layers + 1):
+                param_name = "num_hidden_nodes" + str(layer_idx)
+                setattr(args, param_name, net_config[layer_idx - 1])
+        else:
+            setattr(args, "num_hidden_layers", load_args["num_hidden_layers"])
+            for layer_idx in range(1, args.num_hidden_layers + 1):
+                param_name = "num_hidden_nodes" + str(layer_idx)
+                setattr(args, param_name, load_args[param_name])
 
     model_state_dict = state['model_state_dict']
 
