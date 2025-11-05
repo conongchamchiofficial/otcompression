@@ -16,7 +16,7 @@ from ground_metric import GroundMetric
 from test_layer_similarity import cca, cka, gram_linear
 # from log import logger
 from torch.autograd import Variable
-# from wasserstein_ensemble import get_network_from_param_list
+from wasserstein_ensemble import get_network_from_param_list
 
 def get_number_of_neurons(network):
     """
