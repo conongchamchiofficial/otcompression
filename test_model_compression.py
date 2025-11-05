@@ -427,7 +427,7 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
         print("Change configuration from list of hidden_layer_sizes to num_hidden_layers/num_hidden_nodes style.")
         setattr(args, "parse_config", False)
         
-    new_acc, new_network = get_network_from_param_list(args, param_list, test_loader)
+    new_acc, new_network = get_network_from_param_list(args, new_weight, test_loader)
     print(new_acc)
 
     return new_weight, args
