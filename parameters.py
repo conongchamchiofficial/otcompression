@@ -106,8 +106,6 @@ def get_parser():
     parser.add_argument('--num-hidden-nodes4', default=50, type=int,
                         help='mlpnet: number of hidden nodes in the hidden layer 3')
 
-    parser.add_argument("--desired-number-of-hidden-layers", default=2, type=int, help="mlpnet: compressed model's number of hidden layers")
-
     parser.add_argument('--sweep-id', default=-1, type=int, help='sweep id ')
 
     parser.add_argument('--gpu-id', default=3, type=int, help='GPU id to use')
