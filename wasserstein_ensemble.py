@@ -848,7 +848,7 @@ def get_acts_wassersteinized_layers_modularized(args, networks, activations, eps
         idx += 1
     return avg_aligned_layers
 
-def get_network_from_param_list(args, param_list, test_loader):
+def get_network_from_param_list(args, param_list, test_loader, model_name=None,):
 
     print("using independent method")
     new_network = get_model_from_name(args, idx=1)
