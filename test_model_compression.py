@@ -374,21 +374,23 @@ def approximate_relu(act_mat, num_columns, args, method):
         return np.tile(act_vec, (1, num_columns))
 
 
-def merge_layers(args, network0, num_layer0, acts, I, method):
+def merge_layers(args, networks, num_layers, model_names, acts, I, method):
     """
     Merge consecutive layers in the larger model.
 
     :param args: config parameters
-    :param network0: the large model
-    :param num_layer0: the number of layers of the large model
+    :param networks: list of models
+    :param num_layers:  list of number of layers
+    :param model_names: list of model names
     :param acts: list of activation matrices for hidden layers
     :param I: groups of layers merged
     :param method: method to approximate the sign of activation ["sum", "majority"], default = "sum"
     
     :return: list of weight matrix of the new model and the updated args
     """
-    new_weight = []
-    network_params = list(network0.named_parameters())
+    args.fused_model_name = model_names[1]
+    new_weights = []
+    network_params = list(networks[0].named_parameters())
     
     if args.dataset == "mnist":
         input_dim = 784
@@ -413,10 +415,10 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
             else:
                 print(f"Main layer {layer}")
                 pre_weight = layer_weight @ pre_weight
-                setattr(args, "num_hidden_nodes" + str(len(new_weight) + 1), layer_weight.shape[0]) # check wth is this
-                new_weight.append(pre_weight)
+                setattr(args, "num_hidden_nodes" + str(len(new_weights) + 1), layer_weight.shape[0]) # check wth is this
+                new_weights.append(pre_weight)
                 pre_weight = torch.eye(layer_weight.shape[0]).cuda(args.gpu_id)
-    setattr(args, "num_hidden_layers", len(new_weight))
+    setattr(args, "num_hidden_layers", len(new_weights))
 
     if args.dataset == "mnist":
         _, test_loader = get_dataloader(args)
@@ -427,10 +429,10 @@ def merge_layers(args, network0, num_layer0, acts, I, method):
         print("Change configuration from list of hidden_layer_sizes to num_hidden_layers/num_hidden_nodes style.")
         setattr(args, "parse_config", False)
         
-    new_acc, new_network = get_network_from_param_list(args, new_weight, test_loader)
+    new_acc, new_network = get_network_from_param_list(args, new_weights, test_loader, model_name=args.fused_model_name, model_config=model_configs[0])
     print(new_acc)
 
-    return new_weight, args
+    return new_acc, new_network, args
 
 
 def compress_model(args, networks, accuracies, num_layers, model_names=None):
@@ -451,7 +453,7 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     I = choose_layers_to_merge(args, networks[0], num_layers[0], dissimilarity_matrix, num_layers[0] - num_layers[1])
     print(I)
     print("------ Model compression by merging layers via OT ------")
-    new_weights, args = merge_layers(args, networks[0], num_layers[0], config_param0, I, method=args.relu_approx_method)
+    new_acc, new_network, args = merge_layers(args, networks, num_layers, model_names, config_param0, I, method=args.relu_approx_method)
     
     
     return args, networks, accuracies, num_layers, model_names
