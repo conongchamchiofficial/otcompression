@@ -188,151 +188,151 @@ if __name__ == '__main__':
     print("Time taken for model compression is {} seconds".format(str(end_time - st_time)))    
 
     
-    # # run geometric aka wasserstein ensembling
-    # print("------- Geometric Ensembling -------")
-    # # Deprecated: wasserstein_ensemble.geometric_ensembling(models, train_loader, test_loader)
+    # run geometric aka wasserstein ensembling
+    print("------- Geometric Ensembling -------")
+    # Deprecated: wasserstein_ensemble.geometric_ensembling(models, train_loader, test_loader)
 
 
-    # print("Timer start")
-    # st_time = time.perf_counter()
+    print("Timer start")
+    st_time = time.perf_counter()
 
-    # geometric_acc, geometric_model = wasserstein_ensemble.geometric_ensembling_modularized(args, models, train_loader, test_loader, activations)
+    geometric_acc, geometric_model = wasserstein_ensemble.geometric_ensembling_modularized(args, models, train_loader, test_loader, activations)
     
-    # end_time = time.perf_counter()
-    # print("Timer ends")
-    # setattr(args, 'geometric_time', end_time - st_time)
-    # args.params_geometric = utils.get_model_size(geometric_model)
+    end_time = time.perf_counter()
+    print("Timer ends")
+    setattr(args, 'geometric_time', end_time - st_time)
+    args.params_geometric = utils.get_model_size(geometric_model)
 
-    # print("Time taken for geometric ensembling is {} seconds".format(str(end_time - st_time)))
-    # # run baselines
-    # print("------- Prediction based ensembling -------")
-    # prediction_acc = baseline.prediction_ensembling(args, models, test_loader)
+    print("Time taken for geometric ensembling is {} seconds".format(str(end_time - st_time)))
+    # run baselines
+    print("------- Prediction based ensembling -------")
+    prediction_acc = baseline.prediction_ensembling(args, models, test_loader)
 
-    # print("------- Naive ensembling of weights -------")
-    # naive_acc, naive_model = baseline.naive_ensembling(args, models, test_loader)
+    print("------- Naive ensembling of weights -------")
+    naive_acc, naive_model = baseline.naive_ensembling(args, models, test_loader)
 
-    # if args.retrain > 0:
-    #     print('-------- Retraining the models ---------')
-    #     if args.tensorboard:
-    #         tensorboard_dir = os.path.join(args.tensorboard_root, args.exp_name)
-    #         utils.mkdir(tensorboard_dir)
-    #         print("Tensorboard experiment directory: {}".format(tensorboard_dir))
-    #         tensorboard_obj = SummaryWriter(log_dir=tensorboard_dir)
-    #     else:
-    #         tensorboard_obj = None
+    if args.retrain > 0:
+        print('-------- Retraining the models ---------')
+        if args.tensorboard:
+            tensorboard_dir = os.path.join(args.tensorboard_root, args.exp_name)
+            utils.mkdir(tensorboard_dir)
+            print("Tensorboard experiment directory: {}".format(tensorboard_dir))
+            tensorboard_obj = SummaryWriter(log_dir=tensorboard_dir)
+        else:
+            tensorboard_obj = None
 
-    #     if args.retrain_avg_only or args.retrain_geometric_only:
-    #         if args.retrain_geometric_only:
-    #             initial_acc = [geometric_acc]
-    #             nicks = ['geometric']
-    #             _, best_retrain_acc = routines.retrain_models(args, [geometric_model], retrain_loader,
-    #                                                           test_loader, config_list[0], tensorboard_obj=tensorboard_obj,
-    #                                                           initial_acc=initial_acc, nicks=nicks)
-    #             args.retrain_geometric_best = best_retrain_acc[0]
-    #             args.retrain_naive_best = -1
-    #         else:
-    #             if naive_acc < 0:
-    #                 initial_acc = [geometric_acc]
-    #                 nicks = ['geometric']
-    #                 _, best_retrain_acc = routines.retrain_models(args, [geometric_model],
-    #                                                               retrain_loader, test_loader, config_list[0],
-    #                                                               tensorboard_obj=tensorboard_obj,
-    #                                                               initial_acc=initial_acc, nicks=nicks)
-    #                 args.retrain_geometric_best = best_retrain_acc[0]
-    #                 args.retrain_naive_best = -1
-    #             else:
-    #                 nicks = ['geometric', 'naive_averaging']
-    #                 initial_acc = [geometric_acc, naive_acc]
-    #                 _, best_retrain_acc = routines.retrain_models(args, [geometric_model, naive_model], retrain_loader, test_loader, config_list[0], tensorboard_obj=tensorboard_obj, initial_acc=initial_acc, nicks=nicks)
-    #                 args.retrain_geometric_best = best_retrain_acc[0]
-    #                 args.retrain_naive_best = best_retrain_acc[1]
+        if args.retrain_avg_only or args.retrain_geometric_only:
+            if args.retrain_geometric_only:
+                initial_acc = [geometric_acc]
+                nicks = ['geometric']
+                _, best_retrain_acc = routines.retrain_models(args, [geometric_model], retrain_loader,
+                                                              test_loader, config_list[0], tensorboard_obj=tensorboard_obj,
+                                                              initial_acc=initial_acc, nicks=nicks)
+                args.retrain_geometric_best = best_retrain_acc[0]
+                args.retrain_naive_best = -1
+            else:
+                if naive_acc < 0:
+                    initial_acc = [geometric_acc]
+                    nicks = ['geometric']
+                    _, best_retrain_acc = routines.retrain_models(args, [geometric_model],
+                                                                  retrain_loader, test_loader, config_list[0],
+                                                                  tensorboard_obj=tensorboard_obj,
+                                                                  initial_acc=initial_acc, nicks=nicks)
+                    args.retrain_geometric_best = best_retrain_acc[0]
+                    args.retrain_naive_best = -1
+                else:
+                    nicks = ['geometric', 'naive_averaging']
+                    initial_acc = [geometric_acc, naive_acc]
+                    _, best_retrain_acc = routines.retrain_models(args, [geometric_model, naive_model], retrain_loader, test_loader, config_list[0], tensorboard_obj=tensorboard_obj, initial_acc=initial_acc, nicks=nicks)
+                    args.retrain_geometric_best = best_retrain_acc[0]
+                    args.retrain_naive_best = best_retrain_acc[1]
 
-    #         args.retrain_model0_best = -1
-    #         args.retrain_model1_best = -1
+            args.retrain_model0_best = -1
+            args.retrain_model1_best = -1
 
-    #     else:
+        else:
 
-    #         if args.skip_retrain == 0:
-    #             original_models = [models[1]]
-    #             original_nicks = ['model_1']
-    #             original_accuracies = [accuracies[1]]
-    #         elif args.skip_retrain == 1:
-    #             original_models = [models[0]]
-    #             original_nicks = ['model_0']
-    #             original_accuracies = [accuracies[0]]
-    #         elif args.skip_retrain < 0:
-    #             original_models = models
-    #             original_nicks = ['model_0', 'model_1']
-    #             original_accuracies = accuracies
-    #         else:
-    #             raise NotImplementedError
+            if args.skip_retrain == 0:
+                original_models = [models[1]]
+                original_nicks = ['model_1']
+                original_accuracies = [accuracies[1]]
+            elif args.skip_retrain == 1:
+                original_models = [models[0]]
+                original_nicks = ['model_0']
+                original_accuracies = [accuracies[0]]
+            elif args.skip_retrain < 0:
+                original_models = models
+                original_nicks = ['model_0', 'model_1']
+                original_accuracies = accuracies
+            else:
+                raise NotImplementedError
 
-    #         if naive_acc < 0:
-    #             # this happens in case the two models have different layer sizes
-    #             nicks = original_nicks + ['geometric']
-    #             initial_acc = original_accuracies + [geometric_acc]
-    #             _, best_retrain_acc = routines.retrain_models(args, [*original_models, geometric_model],
-    #                                                           retrain_loader, test_loader, config_list[0],
-    #                                                           tensorboard_obj=tensorboard_obj, initial_acc=initial_acc, nicks=nicks)
-    #             args.retrain_naive_best = -1
-    #         else:
-    #             nicks = original_nicks + ['geometric', 'naive_averaging']
-    #             initial_acc = [*original_accuracies, geometric_acc, naive_acc]
-    #             _, best_retrain_acc = routines.retrain_models(args, [*original_models, geometric_model, naive_model], retrain_loader, test_loader, config_list[0], tensorboard_obj=tensorboard_obj, initial_acc=initial_acc, nicks=nicks)
-    #             args.retrain_naive_best = best_retrain_acc[len(initial_acc)-1]
+            if naive_acc < 0:
+                # this happens in case the two models have different layer sizes
+                nicks = original_nicks + ['geometric']
+                initial_acc = original_accuracies + [geometric_acc]
+                _, best_retrain_acc = routines.retrain_models(args, [*original_models, geometric_model],
+                                                              retrain_loader, test_loader, config_list[0],
+                                                              tensorboard_obj=tensorboard_obj, initial_acc=initial_acc, nicks=nicks)
+                args.retrain_naive_best = -1
+            else:
+                nicks = original_nicks + ['geometric', 'naive_averaging']
+                initial_acc = [*original_accuracies, geometric_acc, naive_acc]
+                _, best_retrain_acc = routines.retrain_models(args, [*original_models, geometric_model, naive_model], retrain_loader, test_loader, config_list[0], tensorboard_obj=tensorboard_obj, initial_acc=initial_acc, nicks=nicks)
+                args.retrain_naive_best = best_retrain_acc[len(initial_acc)-1]
 
-    #         if args.skip_retrain == 0:
-    #             args.retrain_model0_best = -1
-    #             args.retrain_model1_best = best_retrain_acc[0]
-    #         elif args.skip_retrain == 1:
-    #             args.retrain_model0_best = best_retrain_acc[0]
-    #             args.retrain_model1_best = -1
-    #         elif args.skip_retrain < 0:
-    #             args.retrain_model0_best = best_retrain_acc[0]
-    #             args.retrain_model1_best = best_retrain_acc[1]
+            if args.skip_retrain == 0:
+                args.retrain_model0_best = -1
+                args.retrain_model1_best = best_retrain_acc[0]
+            elif args.skip_retrain == 1:
+                args.retrain_model0_best = best_retrain_acc[0]
+                args.retrain_model1_best = -1
+            elif args.skip_retrain < 0:
+                args.retrain_model0_best = best_retrain_acc[0]
+                args.retrain_model1_best = best_retrain_acc[1]
 
-    #         args.retrain_geometric_best = best_retrain_acc[len(original_models)]
+            args.retrain_geometric_best = best_retrain_acc[len(original_models)]
 
-    # if args.save_result_file != '':
+    if args.save_result_file != '':
 
-    #     results_dic = {}
-    #     results_dic['exp_name'] = args.exp_name
+        results_dic = {}
+        results_dic['exp_name'] = args.exp_name
 
-    #     for idx, acc in enumerate(accuracies):
-    #         results_dic['model{}_acc'.format(idx)] = acc
+        for idx, acc in enumerate(accuracies):
+            results_dic['model{}_acc'.format(idx)] = acc
 
-    #     results_dic['geometric_acc'] = geometric_acc
-    #     results_dic['prediction_acc'] = prediction_acc
-    #     results_dic['naive_acc'] = naive_acc
+        results_dic['geometric_acc'] = geometric_acc
+        results_dic['prediction_acc'] = prediction_acc
+        results_dic['naive_acc'] = naive_acc
 
-    #     # Additional statistics
-    #     results_dic['geometric_gain'] = geometric_acc - max(accuracies)
-    #     results_dic['geometric_gain_%'] = ((geometric_acc - max(accuracies))*100.0)/max(accuracies)
-    #     results_dic['prediction_gain'] = prediction_acc - max(accuracies)
-    #     results_dic['prediction_gain_%'] = ((prediction_acc - max(accuracies)) * 100.0) / max(accuracies)
-    #     results_dic['relative_loss_wrt_prediction'] = results_dic['prediction_gain_%'] - results_dic['geometric_gain_%']
+        # Additional statistics
+        results_dic['geometric_gain'] = geometric_acc - max(accuracies)
+        results_dic['geometric_gain_%'] = ((geometric_acc - max(accuracies))*100.0)/max(accuracies)
+        results_dic['prediction_gain'] = prediction_acc - max(accuracies)
+        results_dic['prediction_gain_%'] = ((prediction_acc - max(accuracies)) * 100.0) / max(accuracies)
+        results_dic['relative_loss_wrt_prediction'] = results_dic['prediction_gain_%'] - results_dic['geometric_gain_%']
 
-    #     if args.eval_aligned:
-    #         results_dic['model0_aligned'] = args.model0_aligned_acc
+        if args.eval_aligned:
+            results_dic['model0_aligned'] = args.model0_aligned_acc
 
-    #     results_dic['geometric_time'] = args.geometric_time
-    #     # Save retrain statistics!
-    #     if args.retrain > 0:
-    #         results_dic['retrain_geometric_best'] = args.retrain_geometric_best * 100
-    #         results_dic['retrain_naive_best'] = args.retrain_naive_best * 100
-    #         if not args.retrain_avg_only:
-    #             results_dic['retrain_model0_best'] = args.retrain_model0_best * 100
-    #             results_dic['retrain_model1_best'] = args.retrain_model1_best * 100
-    #         results_dic['retrain_epochs'] = args.retrain
+        results_dic['geometric_time'] = args.geometric_time
+        # Save retrain statistics!
+        if args.retrain > 0:
+            results_dic['retrain_geometric_best'] = args.retrain_geometric_best * 100
+            results_dic['retrain_naive_best'] = args.retrain_naive_best * 100
+            if not args.retrain_avg_only:
+                results_dic['retrain_model0_best'] = args.retrain_model0_best * 100
+                results_dic['retrain_model1_best'] = args.retrain_model1_best * 100
+            results_dic['retrain_epochs'] = args.retrain
 
-    #     utils.save_results_params_csv(
-    #         os.path.join(args.csv_dir, args.save_result_file),
-    #         results_dic,
-    #         args
-    #     )
+        utils.save_results_params_csv(
+            os.path.join(args.csv_dir, args.save_result_file),
+            results_dic,
+            args
+        )
 
-    #     print('----- Saved results at {} ------'.format(args.save_result_file))
-    #     print(results_dic)
+        print('----- Saved results at {} ------'.format(args.save_result_file))
+        print(results_dic)
 
 
-    # print("FYI: the parameters were: \n", args)
+    print("FYI: the parameters were: \n", args)
