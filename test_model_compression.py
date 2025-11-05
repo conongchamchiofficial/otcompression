@@ -269,7 +269,7 @@ def find_min_position(matrix):
     return min_row_index, min_col_index, min_value
 
 
-def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
+def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix, desired_number_of_hidden_layers):
     """
     Choose top-k layers to merge in large model
 
@@ -280,8 +280,8 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix):
     inner_group = []
     num_hidden_layer = num_layer0 - 1
     num_merged_grp = 0
-    if args.compression_only and args.desired_number_of_hidden_layers <= num_hidden_layer:
-        while num_merged_grp < (num_hidden_layer - args.desired_number_of_hidden_layers):
+    if args.compression_only and desired_number_of_hidden_layers <= num_hidden_layer:
+        while num_merged_grp < (num_hidden_layer - desired_number_of_hidden_layers):
             min_row_index, min_col_index, min_value = find_min_position(dissimilarity_matrix)
             for idx, grp in enumerate(I):
                 if min_row_index == grp[-1]:
@@ -448,7 +448,7 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     dissimilarity_matrix, config_param0, config_param1 = get_dissimilarity_matrix(args, networks, num_layers, model_names)
 
     print("------ Choose top-k layers to merge ------")
-    I = choose_layers_to_merge(args, networks[0], num_layers[0], dissimilarity_matrix)
+    I = choose_layers_to_merge(args, networks[0], num_layers[0], dissimilarity_matrix, num_layers[0] - num_layers[1])
     print(I)
     print("------ Model compression by merging layers via OT ------")
     new_weights, args = merge_layers(args, networks[0], num_layers[0], config_param0, I, method=args.relu_approx_method)
