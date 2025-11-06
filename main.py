@@ -215,11 +215,11 @@ if __name__ == '__main__':
 
     print("Time taken for geometric ensembling is {} seconds".format(str(end_time - st_time)))
     # run baselines
-    print("------- Prediction based ensembling -------")
-    prediction_acc = baseline.prediction_ensembling(args, models, test_loader)
+    # print("------- Prediction based ensembling -------")
+    # prediction_acc = baseline.prediction_ensembling(args, models, test_loader)
 
-    print("------- Naive ensembling of weights -------")
-    naive_acc, naive_model = baseline.naive_ensembling(args, models, test_loader)
+    # print("------- Naive ensembling of weights -------")
+    # naive_acc, naive_model = baseline.naive_ensembling(args, models, test_loader)
 
     if args.retrain > 0:
         print('-------- Retraining the models ---------')
@@ -312,15 +312,15 @@ if __name__ == '__main__':
             results_dic['model{}_acc'.format(idx)] = acc
 
         results_dic['geometric_acc'] = geometric_acc
-        results_dic['prediction_acc'] = prediction_acc
-        results_dic['naive_acc'] = naive_acc
+        # results_dic['prediction_acc'] = prediction_acc
+        # results_dic['naive_acc'] = naive_acc
 
         # Additional statistics
         results_dic['geometric_gain'] = geometric_acc - max(accuracies)
         results_dic['geometric_gain_%'] = ((geometric_acc - max(accuracies))*100.0)/max(accuracies)
-        results_dic['prediction_gain'] = prediction_acc - max(accuracies)
-        results_dic['prediction_gain_%'] = ((prediction_acc - max(accuracies)) * 100.0) / max(accuracies)
-        results_dic['relative_loss_wrt_prediction'] = results_dic['prediction_gain_%'] - results_dic['geometric_gain_%']
+        # results_dic['prediction_gain'] = prediction_acc - max(accuracies)
+        # results_dic['prediction_gain_%'] = ((prediction_acc - max(accuracies)) * 100.0) / max(accuracies)
+        # results_dic['relative_loss_wrt_prediction'] = results_dic['prediction_gain_%'] - results_dic['geometric_gain_%']
 
         if args.eval_aligned:
             results_dic['model0_aligned'] = args.model0_aligned_acc
