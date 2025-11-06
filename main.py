@@ -191,6 +191,13 @@ if __name__ == '__main__':
         for name, param in model.named_parameters():
             print(f'Model {idx} layer {name} has #params {param.numel()} and parameters {param.shape}')
     
+    print("Activation Timer start")
+    st_time = time.perf_counter()
+    activations = utils.get_model_activations(args, models, config=config_list[0])
+    end_time = time.perf_counter()
+    setattr(args, 'activation_time', end_time - st_time)
+    print("Activation Timer ends")
+    
     # run geometric aka wasserstein ensembling
     print("------- Geometric Ensembling -------")
     # Deprecated: wasserstein_ensemble.geometric_ensembling(models, train_loader, test_loader)
