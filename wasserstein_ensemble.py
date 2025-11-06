@@ -608,6 +608,8 @@ def get_acts_wassersteinized_layers_modularized(args, networks, activations, eps
         print("\n--------------- At layer index {} ------------- \n ".format(idx))
         # layer shape is out x in
         # assert fc_layer0_weight.shape == fc_layer1_weight.shape
+        print("fc_layer0_weight: ", fc_layer0_weight.shape)
+        print("fc_layer1_weight: ", fc_layer1_weight.shape)
         assert _check_layer_sizes(args, idx, fc_layer0_weight.shape, fc_layer1_weight.shape, num_layers)
         print("Previous layer shape is ", previous_layer_shape)
         previous_layer_shape = fc_layer1_weight.shape
