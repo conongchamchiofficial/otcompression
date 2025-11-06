@@ -416,12 +416,17 @@ def merge_layers(args, networks, num_layers, model_names, acts, I, method):
                 assert act_vec.shape == layer_weight.shape
                 if not isinstance(act_vec, torch.Tensor):
                     act_vec = torch.from_numpy(act_vec).cuda(args.gpu_id)
+                print("layer_weight = layer_weight * act_vec", layer_weight.shape, act_vec.shape)
                 layer_weight = layer_weight * act_vec
+                print("pre_weight = layer_weight @ pre_weight", layer_weight.shape, pre_weight.shape)
                 pre_weight = layer_weight @ pre_weight
+                print("pre_weight", pre_weight.shape)
             else:
                 print(f"Main layer {layer}")
+                print("pre_weight = layer_weight @ pre_weight", layer_weight.shape, pre_weight.shape)
                 pre_weight = layer_weight @ pre_weight
-                setattr(args, "num_hidden_nodes" + str(len(new_weights) + 1), layer_weight.shape[0]) # check wth is this
+                print("pre_weight", pre_weight.shape)
+                setattr(args, "num_hidden_nodes" + str(len(new_weights) + 1), layer_weight.shape[0])
                 new_weights.append(pre_weight)
                 pre_weight = torch.eye(layer_weight.shape[0]).cuda(args.gpu_id)
     setattr(args, "num_hidden_layers", len(new_weights))
