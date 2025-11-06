@@ -187,6 +187,9 @@ if __name__ == '__main__':
 
     print("Time taken for model compression is {} seconds".format(str(end_time - st_time)))    
 
+    for idx, model in enumerate(models):
+        for name, param in model.named_parameters():
+            print(f'Model {idx} layer {name} has #params {param.numel()} and parameters {param.shape}')
     
     # run geometric aka wasserstein ensembling
     print("------- Geometric Ensembling -------")
