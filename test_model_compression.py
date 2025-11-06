@@ -465,8 +465,8 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     print(I)
     print("------ Model compression by merging layers via OT ------")
     new_acc, new_network, args = merge_layers(args, networks, num_layers, model_names, config_param0, I, method=args.relu_approx_method)
-    networks[model_index] = new_network
-    accuracies[model_index] = new_acc
+    networks[0] = new_network
+    accuracies[0] = new_acc
     
     for idx, weight in enumerate(networks[1].parameters()):
         if (idx != 0) and (len(weight.shape) > 1):
