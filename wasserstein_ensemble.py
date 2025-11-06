@@ -466,11 +466,11 @@ def _compute_marginals(args, T_var, device, eps=1e-7):
     if args.correction:
         if not args.proper_marginals:
             # think of it as m x 1, scaling weights for m linear combinations of points in X
-            marginals = torch.ones(T_var.shape)
+            marginals = torch.ones(T_var.shape[1], T_var.shape[1])
             if args.gpu_id != -1:
                 marginals = marginals.cuda(args.gpu_id)
 
-            marginals = torch.matmul(T_var, marginals.T)
+            marginals = torch.matmul(T_var, marginals)
             marginals = 1 / (marginals + eps)
             print("marginals are ", marginals)
 
