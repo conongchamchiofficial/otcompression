@@ -470,7 +470,7 @@ def _compute_marginals(args, T_var, device, eps=1e-7):
             if args.gpu_id != -1:
                 marginals = marginals.cuda(args.gpu_id)
 
-            marginals = torch.matmul(T_var, marginals)
+            marginals = torch.matmul(T_var, marginals.T)
             marginals = 1 / (marginals + eps)
             print("marginals are ", marginals)
 
