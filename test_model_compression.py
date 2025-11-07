@@ -462,7 +462,8 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     dissimilarity_matrix, config_param0, config_param1 = get_dissimilarity_matrix(args, networks, num_layers, model_names)
 
     print("------ Choose top-k layers to merge ------")
-    I = choose_layers_to_merge(args, networks[0], num_layers[0], dissimilarity_matrix, num_layers[1] - 1)
+    #I = choose_layers_to_merge(args, networks[0], num_layers[0], dissimilarity_matrix, num_layers[1] - 1)
+    I = [[0, 1], 2, 3, 4]
     print(I)
     print("------ Model compression by merging layers via OT ------")
     new_acc, new_network, args = merge_layers(args, networks, num_layers, model_names, config_param0, I, method=args.relu_approx_method)
