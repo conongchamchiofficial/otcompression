@@ -261,7 +261,7 @@ def find_min_position(matrix):
 
     for row_index, inner_list in enumerate(matrix):
         for col_index, value in enumerate(inner_list):
-            if value < min_value:
+            if value > min_value:
                 min_value = value
                 min_row_index = row_index
                 min_col_index = col_index   
