@@ -255,7 +255,7 @@ def find_min_position(matrix):
     """
     Finds the position (row and column indices) of the minimum value in a list of lists.
     """
-    min_value = float('inf')  # Initialize with a very large value
+    min_value = 0 # float('inf')  # Initialize with a very large value
     min_row_index = -1
     min_col_index = -1
 
