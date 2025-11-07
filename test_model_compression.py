@@ -340,7 +340,7 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix, des
                         dissimilarity_matrix[i][j] = 0 # float('inf')
                 num_merged_grp += min_col_index - min_row_index
                 inner_group = []
-            min_value = f0 # loat('inf')  # Initialize with a very large value
+            min_value = 0 # float('inf')  # Initialize with a very large value
             min_row_index = -1
             min_col_index = -1
             print("I: ", I)
