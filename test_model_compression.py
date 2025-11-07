@@ -329,7 +329,7 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix, des
                 I.append(inner_group)
                 for i in range(min_row_index + 1):
                     for j in range(min_col_index, num_hidden_layer):
-                        dissimilarity_matrix[i][j] = float('inf')
+                        dissimilarity_matrix[i][j] = 0 # float('inf')
                 num_merged_grp += min_col_index - min_row_index
                 inner_group = []
             elif min_col_index - min_row_index > 1:
@@ -337,10 +337,10 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix, des
                 I.append(inner_group)
                 for i in range(min_col_index):
                     for j in range(min_row_index, num_hidden_layer):
-                        dissimilarity_matrix[i][j] = float('inf')
+                        dissimilarity_matrix[i][j] = 0 # float('inf')
                 num_merged_grp += min_col_index - min_row_index
                 inner_group = []
-            min_value = float('inf')  # Initialize with a very large value
+            min_value = f0 # loat('inf')  # Initialize with a very large value
             min_row_index = -1
             min_col_index = -1
             print("I: ", I)
