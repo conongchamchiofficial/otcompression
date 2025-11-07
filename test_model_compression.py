@@ -283,6 +283,7 @@ def choose_layers_to_merge(args, network0, num_layer0, dissimilarity_matrix, des
     if args.compression_only and desired_number_of_hidden_layers <= num_hidden_layer:
         while num_merged_grp < (num_hidden_layer - desired_number_of_hidden_layers):
             min_row_index, min_col_index, min_value = find_min_position(dissimilarity_matrix)
+            print("find_min_position: ",  min_row_index, min_col_index, min_value)
             for idx, grp in enumerate(I):
                 if min_row_index == grp[-1]:
                     if min_col_index - min_row_index == 1:
