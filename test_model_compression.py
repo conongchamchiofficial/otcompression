@@ -446,6 +446,28 @@ def merge_layers(args, networks, num_layers, model_names, acts, I, method):
 
     return new_acc, new_network, args
 
+def fuse_layer(args, networks, num_layers, model_names, acts, I, method):
+    args.fused_model_name = model_names[1]
+    new_weights = []
+    network_params = list(networks[0].named_parameters())
+    
+    if args.dataset == "mnist":
+        input_dim = 784
+    elif args.dataset == "cifar10":
+        input_dim = 3072
+    else:
+        raise ValueError
+
+    for idx_grp, grp in enumerate(I):
+        if len(grp) < 2:
+            continue
+        else:
+            (_, layer_weight0) = network_params[grp[0]]
+            (_, layer_weight1) = network_params[grp[1]]
+    
+    new_acc, new_network = get_network_from_param_list(args, new_weights, test_loader, model_name=args.fused_model_name)
+    return new_acc, new_network, args
+
 
 def compress_model(args, networks, accuracies, num_layers, model_names=None):
     """
