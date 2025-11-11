@@ -228,7 +228,7 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
             if len(layer_weight.shape) == 2:
                 break
     classifier_idx[i] = idx
-    
+    print('x.shape: ', x.shape)
     # get dissimilarity matrix among layers of model 0
     if classifier_idx[0] > 0:
         if "vgg" in model_names[0]:
