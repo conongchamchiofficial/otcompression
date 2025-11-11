@@ -254,6 +254,8 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
             layer_act = layer_act.permute(*reorder_dim).contiguous()
             layer_act = layer_act.view(layer_act.size(0), -1)
             x_new.append(layer_act)
+    else:
+        x_new = x
     
     return dissimilarity_matrix, x_new, y
 
