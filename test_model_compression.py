@@ -485,7 +485,7 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     """
     print("------ Construct dissimilarity matrix among layers in model 0 ------")
     config_param0, config_param1 = get_layer_representation(args, networks, num_layers, model_names)
-    dissimilarity_matrix = get_dissimilarity_matrix(args, networks, num_layers, config_param0)
+    dissimilarity_matrix = get_dissimilarity_matrix(args, networks, num_layers, model_names, config_param0)
 
     print("------ Choose top-k layers to merge ------")
     I = choose_layers_to_merge(args, networks[0], num_layers[0], dissimilarity_matrix, num_layers[1] - 1)
