@@ -369,32 +369,33 @@ def approximate_relu(act_mat, num_columns, args, method):
     :param method: method to approximate the sign of activation ["sum", "majority", "avg"], default = "sum"
     :return: a matrix in which each row has the same value
     """
-    # if method == "sum":
-    #     act_vec = act_mat.sum(axis=1) >= 0
-    # elif method == "majority":
-    #     act_vec = (act_mat > 0).mean(axis=1) >= 0.5
-    # elif method == "avg":
-    #     act_vec = ((act_mat > 0) * 1.0).mean(axis=1)
-    # else:
-    #     raise NotImplementedError
-
-    # if isinstance(act_vec, torch.Tensor):
-    #     return act_vec.unsqueeze(1).repeat(1, num_columns)
-    # else:
-    #     return np.tile(act_vec, (1, num_columns))
     if method == "sum":
-        act_vec = act_mat.sum(axis=0) >= 0
+        act_vec = act_mat.sum(axis=1) >= 0
     elif method == "majority":
-        act_vec = (act_mat > 0).mean(axis=0) >= 0.5
+        act_vec = (act_mat > 0).mean(axis=1) >= 0.5
     elif method == "avg":
-        act_vec = ((act_mat > 0) * 1.0).mean(axis=0)
+        act_vec = ((act_mat > 0) * 1.0).mean(axis=1)
     else:
         raise NotImplementedError
 
     if isinstance(act_vec, torch.Tensor):
-        return act_vec.unsqueeze(0).repeat(num_columns, 1).T
+        return act_vec.unsqueeze(1).repeat(1, num_columns)
     else:
-        return np.tile(act_vec, (num_columns, 1)).T
+        return np.tile(act_vec, (1, num_columns))
+    
+    # if method == "sum":
+    #     act_vec = act_mat.sum(axis=0) >= 0
+    # elif method == "majority":
+    #     act_vec = (act_mat > 0).mean(axis=0) >= 0.5
+    # elif method == "avg":
+    #     act_vec = ((act_mat > 0) * 1.0).mean(axis=0)
+    # else:
+    #     raise NotImplementedError
+
+    # if isinstance(act_vec, torch.Tensor):
+    #     return act_vec.unsqueeze(0).repeat(num_columns, 1).T
+    # else:
+    #     return np.tile(act_vec, (num_columns, 1)).T
 
 
 def merge_layers(args, networks, num_layers, model_names, acts, I, method):
@@ -423,6 +424,32 @@ def merge_layers(args, networks, num_layers, model_names, acts, I, method):
         raise ValueError
     pre_weight = torch.eye(input_dim).cuda(args.gpu_id)
     
+    for idx_grp, grp in enumerate(I):
+        for idx_layer, layer in enumerate(grp):
+            (_, layer_weight) = network_params[layer]
+            if layer != grp[-1]:
+                print(f"Merge layer {layer} with {grp[idx_layer + 1]}")
+                print("Approximate ReLU at hidden layer {} with activation of shape {}".format(layer + 1, acts[layer].shape))
+                act_vec = approximate_relu(acts[layer].T, layer_weight.shape[1], args, method)
+                print("act_vec.shape == layer_weight.shape", act_vec.shape, layer_weight.shape)
+                assert act_vec.shape == layer_weight.shape
+                if not isinstance(act_vec, torch.Tensor):
+                    act_vec = torch.from_numpy(act_vec).cuda(args.gpu_id)
+                print("layer_weight = layer_weight * act_vec", layer_weight.shape, act_vec.shape)
+                layer_weight = layer_weight * act_vec
+                print("pre_weight = layer_weight @ pre_weight", layer_weight.shape, pre_weight.shape)
+                pre_weight = layer_weight @ pre_weight
+                print("pre_weight", pre_weight.shape)
+            else:
+                print(f"Main layer {layer}")
+                print("pre_weight = layer_weight @ pre_weight", layer_weight.shape, pre_weight.shape)
+                pre_weight = layer_weight @ pre_weight
+                print("pre_weight", pre_weight.shape)
+                setattr(args, "num_hidden_nodes" + str(len(new_weights) + 1), layer_weight.shape[0])
+                new_weights.append(pre_weight)
+                pre_weight = torch.eye(layer_weight.shape[0]).cuda(args.gpu_id)
+    setattr(args, "num_hidden_layers", len(new_weights))
+
     # for idx_grp, grp in enumerate(I):
     #     for idx_layer, layer in enumerate(grp):
     #         (_, layer_weight) = network_params[layer]
@@ -436,7 +463,7 @@ def merge_layers(args, networks, num_layers, model_names, acts, I, method):
     #                 act_vec = torch.from_numpy(act_vec).cuda(args.gpu_id)
     #             print("layer_weight = layer_weight * act_vec", layer_weight.shape, act_vec.shape)
     #             layer_weight = layer_weight * act_vec
-    #             print("pre_weight = layer_weight @ pre_weight", layer_weight.shape, pre_weight.shape)
+    #             print("pre_weight = pre_weight @ layer_weight", pre_weight.shape, layer_weight.shape)
     #             pre_weight = layer_weight @ pre_weight
     #             print("pre_weight", pre_weight.shape)
     #         else:
@@ -448,32 +475,6 @@ def merge_layers(args, networks, num_layers, model_names, acts, I, method):
     #             new_weights.append(pre_weight)
     #             pre_weight = torch.eye(layer_weight.shape[0]).cuda(args.gpu_id)
     # setattr(args, "num_hidden_layers", len(new_weights))
-
-    for idx_grp, grp in enumerate(I):
-        for idx_layer, layer in enumerate(grp):
-            (_, layer_weight) = network_params[layer]
-            if layer != grp[-1]:
-                print(f"Merge layer {layer} with {grp[idx_layer + 1]}")
-                print("Approximate ReLU at hidden layer {} with activation of shape {}".format(layer + 1, acts[layer].shape))
-                act_vec = approximate_relu(acts[layer], layer_weight.shape[1], args, method)
-                print("act_vec.shape == layer_weight.shape", act_vec.shape, layer_weight.shape)
-                assert act_vec.shape == layer_weight.shape
-                if not isinstance(act_vec, torch.Tensor):
-                    act_vec = torch.from_numpy(act_vec).cuda(args.gpu_id)
-                print("layer_weight = layer_weight * act_vec", layer_weight.shape, act_vec.shape)
-                layer_weight = layer_weight * act_vec
-                print("pre_weight = pre_weight @ layer_weight", pre_weight.shape, layer_weight.shape)
-                pre_weight = pre_weight @ layer_weight
-                print("pre_weight", pre_weight.shape)
-            else:
-                print(f"Main layer {layer}")
-                print("pre_weight = layer_weight @ pre_weight", layer_weight.shape, pre_weight.shape)
-                pre_weight = layer_weight @ pre_weight
-                print("pre_weight", pre_weight.shape)
-                setattr(args, "num_hidden_nodes" + str(len(new_weights) + 1), layer_weight.shape[0])
-                new_weights.append(pre_weight)
-                pre_weight = torch.eye(layer_weight.shape[0]).cuda(args.gpu_id)
-    setattr(args, "num_hidden_layers", len(new_weights))
 
     if args.dataset == "mnist":
         _, test_loader = get_dataloader(args)
