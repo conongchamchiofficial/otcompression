@@ -181,24 +181,7 @@ def get_histogram(args, idx, cardinality, layer_name, activations=None, return_n
             return torch.softmax(unnormalized_weights / args.softmax_temperature, dim=0)
 
 
-def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_dataset=None):
-    """
-    Calculate dissimilarity index among layers in the large model
-    
-    :param args: config parameters
-    :param networks: list of models
-    :param num_layers: list of num_layers
-    :param model_names: list of model_names
-    :return: a dissimilarity matrix
-    """
-    # measure time
-    # act_time = 0
-    # align_time = 0
-    # align_st_time = time.perf_counter()
-
-    # initialize dissmilarity matrix among hidden layers
-    dissimilarity_matrix = np.full((num_layers[0] - 1, num_layers[0] - 1), np.inf)
-    
+def get_layer_representation(args, networks, num_layers, model_names, personal_dataset=None):
     # get layer representation of models (check x, y for layers within model)
     layer_representations = []
     if args.layer_measure == "index":
@@ -221,6 +204,26 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
         # act_end_time = time.perf_counter()
         # act_time = act_end_time - act_st_time
         assert args.layer_metric in ["cka", "cca", "wd"]
+    return x, y
+
+
+def get_dissimilarity_matrix(args, networks, num_layers, model_names, x):
+    """
+    Calculate dissimilarity index among layers in the large model
+    
+    :param args: config parameters
+    :param networks: list of models
+    :param num_layers: list of num_layers
+    :param model_names: list of model_names
+    :return: a dissimilarity matrix
+    """
+    # measure time
+    # act_time = 0
+    # align_time = 0
+    # align_st_time = time.perf_counter()
+
+    # initialize dissmilarity matrix among hidden layers
+    dissimilarity_matrix = np.full((num_layers[0] - 1, num_layers[0] - 1), np.inf)
     
     # separate where is the FC layer start
     classifier_idx = [0, 0]
@@ -246,18 +249,8 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
         dissimilarity_matrix = get_cost_matrix(x[classifier_idx[0] :], args)
         #print("Cost matrix between layers {}-{} of model 0 is \n{}".format(classifier_idx[0], len(x), dissimilarity_matrix))
     print("Dissimilarity matrix among layers of model 0 is {}".format(dissimilarity_matrix))
-    if not is_wd:
-        x_new = []
-        for layer_act in x:
-            reorder_dim = [l for l in range(2, len(layer_act.shape))]
-            reorder_dim.extend([0, 1])
-            layer_act = layer_act.permute(*reorder_dim).contiguous()
-            layer_act = layer_act.view(layer_act.size(0), -1)
-            x_new.append(layer_act)
-    else:
-        x_new = x
     
-    return dissimilarity_matrix, x_new, y
+    return dissimilarity_matrix
 
 
 def find_min_position(matrix):
@@ -423,6 +416,7 @@ def merge_layers(args, networks, num_layers, model_names, acts, I, method):
                 print(f"Merge layer {layer} with {grp[idx_layer + 1]}")
                 print("Approximate ReLU at hidden layer {} with activation of shape {}".format(layer + 1, acts[layer].shape))
                 act_vec = approximate_relu(acts[layer], layer_weight.shape[1], args, method)
+                print("act_vec.shape == layer_weight.shape", act_vec.shape, layer_weight.shape)
                 assert act_vec.shape == layer_weight.shape
                 if not isinstance(act_vec, torch.Tensor):
                     act_vec = torch.from_numpy(act_vec).cuda(args.gpu_id)
@@ -490,7 +484,8 @@ def compress_model(args, networks, accuracies, num_layers, model_names=None):
     :return: updated large model, accuracy and config parameters
     """
     print("------ Construct dissimilarity matrix among layers in model 0 ------")
-    dissimilarity_matrix, config_param0, config_param1 = get_dissimilarity_matrix(args, networks, num_layers, model_names)
+    config_param0, config_param1 = get_layer_representation(args, networks, num_layers, model_names)
+    dissimilarity_matrix = get_dissimilarity_matrix(args, networks, num_layers, config_param0)
 
     print("------ Choose top-k layers to merge ------")
     I = choose_layers_to_merge(args, networks[0], num_layers[0], dissimilarity_matrix, num_layers[1] - 1)
