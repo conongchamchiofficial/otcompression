@@ -245,10 +245,17 @@ def get_dissimilarity_matrix(args, networks, num_layers, model_names, personal_d
         #print(x[classifier_idx[0] :])
         dissimilarity_matrix = get_cost_matrix(x[classifier_idx[0] :], args)
         #print("Cost matrix between layers {}-{} of model 0 is \n{}".format(classifier_idx[0], len(x), dissimilarity_matrix))
-
     print("Dissimilarity matrix among layers of model 0 is {}".format(dissimilarity_matrix))
-
-    return dissimilarity_matrix, x, y
+    if not is_wd:
+        x_new = []
+        for layer_act in x:
+            reorder_dim = [l for l in range(2, len(layer_act.shape))]
+            reorder_dim.extend([0, 1])
+            layer_act = layer_act.permute(*reorder_dim).contiguous()
+            layer_act = layer_act.view(layer_act.size(0), -1)
+            x_new.append(layer_act)
+    
+    return dissimilarity_matrix, x_new, y
 
 
 def find_min_position(matrix):
